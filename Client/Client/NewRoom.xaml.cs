@@ -10,30 +10,18 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace Client
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for NewRoom.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class NewRoom : Window
     {
-        public MainWindow()
+        public NewRoom()
         {
             InitializeComponent();
-        }
-
-        private void NewRoom(object sender, RoutedEventArgs e)
-        {
-            NewRoom CreateRoom = new NewRoom();
-            CreateRoom.Show();
-        }
-
-        private void JoinToRoom(object sender, RoutedEventArgs e)
-        {
-
         }
     }
 }
