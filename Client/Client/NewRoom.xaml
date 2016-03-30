@@ -8,26 +8,26 @@
         Title="Tworzenie pokoju" Height="500" Width="800">
     <Grid>
         <Label x:Name="label" Content="Nazwa pokoju:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="147" Margin="103,13,0,0"/>
-        <Button x:Name="button" Content="Utwórz pokój" HorizontalAlignment="Left" Margin="289,13,0,0" VerticalAlignment="Top" Width="93"/>
-        <ListView x:Name="listView" HorizontalAlignment="Left" Height="325" Margin="22,79,0,0" VerticalAlignment="Top" Width="206">
+        <TextBox x:Name="tBNameRoom" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="147" Margin="103,13,0,0"/>
+        <Button x:Name="BtCreateRoom" Content="Utwórz pokój" HorizontalAlignment="Left" Margin="289,12,0,0" VerticalAlignment="Top" Width="93"/>
+        <ListView x:Name="lVListRoom" HorizontalAlignment="Left" Height="325" Margin="22,79,0,0" VerticalAlignment="Top" Width="206">
             <ListView.View>
                 <GridView>
                     <GridViewColumn/>
                 </GridView>
             </ListView.View>
         </ListView>
-        <Button x:Name="button1" Content="Usuń pokój" HorizontalAlignment="Left" Margin="407,12,0,0" VerticalAlignment="Top" Width="75"/>
+        <Button x:Name="BtRemoveRoom" Content="Usuń pokój" HorizontalAlignment="Left" Margin="407,12,0,0" VerticalAlignment="Top" Width="75"/>
         <GridSplitter x:Name="gridSplitter" HorizontalAlignment="Left" Height="325" Margin="255,79,0,0" VerticalAlignment="Top" Width="7"/>
-        <ListView x:Name="listView1" HorizontalAlignment="Left" Height="325" Margin="563,79,0,0" VerticalAlignment="Top" Width="206">
+        <ListView x:Name="lVListPlayerToStart" HorizontalAlignment="Left" Height="325" Margin="563,79,0,0" VerticalAlignment="Top" Width="206">
             <ListView.View>
                 <GridView>
                     <GridViewColumn/>
                 </GridView>
             </ListView.View>
         </ListView>
-        <Button x:Name="button2" Content="Usuń gracza z pokoju" HorizontalAlignment="Left" Margin="510,12,0,0" VerticalAlignment="Top" Width="129"/>
-        <ListView x:Name="listView2" HorizontalAlignment="Left" Height="325" Margin="289,79,0,0" VerticalAlignment="Top" Width="224">
+        <Button x:Name="BtRemovePlayer" Content="Usuń gracza z pokoju" HorizontalAlignment="Left" Margin="510,12,0,0" VerticalAlignment="Top" Width="129"/>
+        <ListView x:Name="lVPlayerList" HorizontalAlignment="Left" Height="325" Margin="289,79,0,0" VerticalAlignment="Top" Width="224">
             <ListView.View>
                 <GridView>
                     <GridViewColumn/>
@@ -35,7 +35,7 @@
             </ListView.View>
         </ListView>
         <GridSplitter x:Name="gridSplitter_Copy" HorizontalAlignment="Left" Height="325" Margin="535,79,0,0" VerticalAlignment="Top" Width="7"/>
-        <Button x:Name="button3" Content="Rozpocznij&#xD;&#xA;grę" HorizontalAlignment="Left" Margin="694,13,0,0" VerticalAlignment="Top" Width="75" Height="40"/>
+        <Button x:Name="BtStartGame" Content="Rozpocznij&#xD;&#xA;grę" HorizontalAlignment="Left" Margin="677,13,0,0" VerticalAlignment="Top" Width="75" Height="40"/>
 
     </Grid>
 </Window>

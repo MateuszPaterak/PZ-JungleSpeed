@@ -33,7 +33,8 @@ namespace Client
 
         private void JoinToRoom(object sender, RoutedEventArgs e)
         {
-
+            JoinRoom JoinToRoom = new JoinRoom();
+            JoinToRoom.Show();
         }
     }
 }
