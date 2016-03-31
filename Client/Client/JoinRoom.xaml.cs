@@ -23,5 +23,25 @@ namespace Client
         {
             InitializeComponent();
         }
+
+        private void btJoinToRoom_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btExitFromRoom_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btJoinToGame_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btExitFromGame_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

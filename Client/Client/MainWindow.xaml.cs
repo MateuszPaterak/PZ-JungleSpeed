@@ -28,13 +28,17 @@ namespace Client
         private void NewRoom(object sender, RoutedEventArgs e)
         {
             NewRoom CreateRoom = new NewRoom();
-            CreateRoom.Show();
+
+            if (CreateRoom.ShowDialog() == true)
+            {
+
+            }
         }
 
         private void JoinToRoom(object sender, RoutedEventArgs e)
         {
             JoinRoom JoinToRoom = new JoinRoom();
-            JoinToRoom.Show();
+            JoinToRoom.ShowDialog();
         }
     }
 }
