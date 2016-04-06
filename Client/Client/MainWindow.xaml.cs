@@ -23,6 +23,8 @@ namespace Client
         public MainWindow()
         {
             InitializeComponent();
+
+            //this.ContentControl.Content = new LogoPicture();
         }
 
         private void NewRoom(object sender, RoutedEventArgs e)
