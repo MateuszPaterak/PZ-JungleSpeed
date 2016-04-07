@@ -27,6 +27,10 @@ namespace Client
             InitializeComponent();
 
             ContentControl.Content = CW.ChangeContent(ContNum.StartImg);
+
+            //test
+            //PlayOff po = new PlayOff();
+            //po.ShowDialog();
         }
 
         private void NewRoom(object sender, RoutedEventArgs e)

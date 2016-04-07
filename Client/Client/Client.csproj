@@ -55,6 +55,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="PlayOff.xaml.cs">
+      <DependentUpon>PlayOff.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Win2Player.xaml.cs">
       <DependentUpon>Win2Player.xaml</DependentUpon>
     </Compile>
@@ -86,6 +89,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="NewRoom.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PlayOff.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -146,6 +153,11 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Pictures\bokeh.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Pictures\IconCut.png" />
+    <Resource Include="Pictures\IconPaper.png" />
+    <Resource Include="Pictures\IconRock.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
