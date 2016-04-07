@@ -20,11 +20,13 @@ namespace Client
     /// </summary>
     public partial class MainWindow : Window
     {
+        private ContentWindow CW = new ContentWindow();
+
         public MainWindow()
         {
             InitializeComponent();
 
-            //this.ContentControl.Content = new LogoPicture();
+            ContentControl.Content = CW.ChangeContent(ContNum.StartImg);
         }
 
         private void NewRoom(object sender, RoutedEventArgs e)
@@ -41,6 +43,11 @@ namespace Client
         {
             JoinRoom JoinToRoom = new JoinRoom();
             JoinToRoom.ShowDialog();
+        }
+
+        private void GameLoop()
+        {
+            
         }
     }
 }

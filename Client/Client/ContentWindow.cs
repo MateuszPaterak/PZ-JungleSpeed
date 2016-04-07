@@ -6,17 +6,26 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 
 namespace Client
-{
-    class ContentWindow
+{ 
+    public enum ContNum : byte
     {
-        public ContentControl ChangeContent(byte nr)
+        StartImg,
+        Win2Player
+    };
+    public class ContentWindow
+    {
+        public ContentControl ChangeContent(ContNum nr)
         {
             switch (nr)
             {
-                case 1:
+                    case ContNum.StartImg:
                 {
                     return new LogoPicture();
-                    break;
+                    //break;
+                }
+                    case ContNum.Win2Player:
+                {
+                    return new Win2Player();
                 }
                 default:
                 {
