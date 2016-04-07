@@ -4,16 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Client"
-             mc:Ignorable="d" 
-             d:DesignHeight="400" d:DesignWidth="400">
-    <Grid x:Name="GridPlayer" Margin="0,30,0,0 " Height="370" Width="400" HorizontalAlignment="Left" VerticalAlignment="Top">
+             mc:Ignorable="d" Height="500" Width="500">
+    <Grid x:Name="GridPlayer" Margin="0,0,0,0" Height="500" Width="500" HorizontalAlignment="Left" VerticalAlignment="Top">
         <Grid.Background>
-            <ImageBrush ImageSource="Pictures/wood.jpg"/>
+            <ImageBrush x:Name="ImgBackground" ImageSource="Pictures/bokeh.jpg"/>
         </Grid.Background>
-        <Image x:Name="ImgTotem" Source="/Pictures/totem.png" HorizontalAlignment="Center" Height="100" Margin="0,0,0,0" VerticalAlignment="Center" Width="Auto"/>
-        <Image x:Name="ImgPlayer1" HorizontalAlignment="Left" Height="127" Margin="252,233,0,0" VerticalAlignment="Top" Width="138"/>
-        <Label x:Name="LabPlayer2" Content="Gracz 2&#xD;&#xA;" HorizontalAlignment="Left" Margin="252,10,0,0" VerticalAlignment="Top" Background="#FFD6D6D6" Width="138"/>
-        <Image x:Name="ImgPlayer2" HorizontalAlignment="Left" Height="135" Margin="10,10,0,0" VerticalAlignment="Top" Width="148"/>
-        <Label x:Name="LabPlayer1" Content="Gracz 1&#xA;" HorizontalAlignment="Left" VerticalAlignment="Top" Background="#FFD6D6D6" Height="55" Width="130" Margin="10,233,0,0"/>
+        <Image x:Name="ImgTotem" Source="/Pictures/totem.png" HorizontalAlignment="Center" Height="150" Margin="0,0,0,0" VerticalAlignment="Center" Width="Auto"/>
     </Grid>
 </UserControl>

@@ -6,11 +6,11 @@
              mc:Ignorable="d" 
              x:Name="LogoPictureControl"
              d:DesignHeight="500" d:DesignWidth="500">
-    <Grid Margin="52,74,44,50">
-        <Button x:Name="BtMenuImg" Height="Auto" Width="404" Click="BtMenuImg_Click">
+    <Grid Margin="0,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center">
+        <Button x:Name="BtMenuImg" Height="500" Width="500" Click="BtMenuImg_Click">
             <Button.Template>
                 <ControlTemplate>
-                    <Image Width="404" Height="Auto" Source="/Pictures/menu.png" Stretch="Fill" HorizontalAlignment="Center" Margin="0,0,0,10" />
+                    <Image Width="500" Height="500" Source="/Pictures/menu.png" Stretch="Fill" HorizontalAlignment="Center" Margin="0,0,0,10" />
                 </ControlTemplate>
             </Button.Template>
         </Button>

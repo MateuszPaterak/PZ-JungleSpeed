@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Client"
         mc:Ignorable="d"
-        Title="Jungle Speed" Height="600" Width="800">
+        Title="Jungle Speed" Height="700" Width="900">
     <Grid>
         <Grid.Background>
             <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
@@ -14,7 +14,7 @@
                 <GradientStop Color="Black" Offset="0.013"/>
             </LinearGradientBrush>
         </Grid.Background>
-        <Menu x:Name="Menu" HorizontalAlignment="Left" Height="24" VerticalAlignment="Top" Width="792">
+        <Menu x:Name="Menu" HorizontalAlignment="Left" Height="25" VerticalAlignment="Top" Width="900">
             <MenuItem Header="Rozgrywka">
                 <MenuItem Header="Utwórz nowy pokój" Click="NewRoom"></MenuItem>
                 <MenuItem Header="Dołącz do pokoju" Click="JoinToRoom"></MenuItem>
@@ -22,6 +22,18 @@
             <MenuItem Header="Pomoc">
             </MenuItem>
         </Menu>
-        <ContentControl x:Name="ContentControl" Grid.Row="0"/>
+        <ContentControl x:Name="ContentControl" Grid.Row="0" Margin="10,35,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="500" Width="500"/>
+        <Button x:Name="BtGetCard" Content="Podnieś &#xD;&#xA;kartę" HorizontalAlignment="Left" Margin="535,48,0,0" VerticalAlignment="Top" Width="80" Height="50"/>
+        <Button x:Name="BtGetTotem" Content="Weź&#xD;&#xA;totem" HorizontalAlignment="Left" Margin="535,130,0,0" VerticalAlignment="Top" Width="80" Height="50"/>
+        <Button x:Name="btOutOfGameplay" Content="Opóść&#xD;&#xA;rozgrywkę" HorizontalAlignment="Left" Margin="535,275,0,0" VerticalAlignment="Top" Width="80" Height="50"/>
+        <ListView x:Name="ListView" HorizontalAlignment="Left" Height="277" Margin="637,48,0,0" VerticalAlignment="Top" Width="239">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn  x:Name="Column1" Header="Nazwa gracza:"/>
+                    <GridViewColumn  x:Name="Column2" Header="Liczba pozostałych kart:"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        
     </Grid>
 </Window>
