@@ -20,24 +20,21 @@ namespace Client
     /// </summary>
     public partial class MainWindow : Window
     {
-        private ContentWindow CW = new ContentWindow();
-
+        private int nr = 1;
         public MainWindow()
         {
             InitializeComponent();
 
-            ContentControl.Content = CW.ChangeContent(ContNum.StartImg);
+            CUserControl.Content = MyContentClassWindow.ChangeContent(ContNum.StartImg);
+            //CUserControl.Content = MyContentClassWindow.ChangeContent(ContNum.PlayersBoard);
 
-            //test
-            //PlayOff po = new PlayOff();
-            //po.ShowDialog();
         }
 
         private void NewRoom(object sender, RoutedEventArgs e)
         {
-            NewRoom CreateRoom = new NewRoom();
+            NewRoom createRoom = new NewRoom();
 
-            if (CreateRoom.ShowDialog() == true)
+            if (createRoom.ShowDialog() == true)
             {
 
             }
@@ -45,13 +42,47 @@ namespace Client
 
         private void JoinToRoom(object sender, RoutedEventArgs e)
         {
-            JoinRoom JoinToRoom = new JoinRoom();
-            JoinToRoom.ShowDialog();
+            JoinRoom joinToRoom = new JoinRoom();
+            joinToRoom.ShowDialog();
         }
 
         private void GameLoop()
         {
             
+        }
+
+        private void BtGetUpCard_Click(object sender, RoutedEventArgs e)
+        {
+            //testy
+            PlayOff po = new PlayOff();
+            po.ShowDialog();
+        }
+
+        private void BtGetTotem_Click(object sender, RoutedEventArgs e)
+        {
+
+            CUserControl.Content = new PlayersTableManager(8);
+            for (byte i = 0; i < 8; i++)
+            {
+                PlayersTableManager.ChangeNamePlayer("Test", i );
+                byte tmp = Convert.ToByte( i%4 +1);
+                PlayersTableManager.ChangePlayerCard(i, tmp );
+
+            }
+            
+        }
+
+        private void BtOutOfGameplay_Click(object sender, RoutedEventArgs e)
+        {
+            nr = ((nr+=1)%9 ) + (nr/9)*2;
+            CUserControl.Content = new PlayersTableManager(Convert.ToByte(nr));
+            for (int i = 0; i < nr; i++)
+            {
+                PlayersTableManager.ChangeNamePlayer("Test", Convert.ToByte(i));
+                byte tmp = Convert.ToByte(i % 4 + 1);
+                PlayersTableManager.ChangePlayerCard(Convert.ToByte(i), tmp);
+
+            }
         }
     }
 }

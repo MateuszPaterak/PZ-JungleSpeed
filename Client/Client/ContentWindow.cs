@@ -10,11 +10,11 @@ namespace Client
     public enum ContNum : byte
     {
         StartImg,
-        Win2Player
+        PlayersBoard
     };
-    public class ContentWindow
+    public static class MyContentClassWindow
     {
-        public ContentControl ChangeContent(ContNum nr)
+        public static ContentControl ChangeContent(ContNum nr)
         {
             switch (nr)
             {
@@ -23,9 +23,9 @@ namespace Client
                     return new LogoPicture();
                     //break;
                 }
-                    case ContNum.Win2Player:
+                    case ContNum.PlayersBoard:
                 {
-                    return new Win2Player();
+                    return new PlayersTableManager();
                 }
                 default:
                 {

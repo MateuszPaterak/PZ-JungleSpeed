@@ -25,11 +25,9 @@ namespace Client
             InitializeComponent();
         }
 
-        private ContentWindow CW = new ContentWindow();
-
         private void BtMenuImg_Click(object sender, RoutedEventArgs e)
         {
-            this.Content = CW.ChangeContent(ContNum.Win2Player);
+            this.Content = MyContentClassWindow.ChangeContent(ContNum.PlayersBoard);
         }
     }
 }

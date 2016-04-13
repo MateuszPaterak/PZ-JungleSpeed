@@ -19,12 +19,13 @@ namespace Client
     /// <summary>
     /// Interaction logic for Win2Player.xaml
     /// </summary>
-    public partial class Win2Player : UserControl
+    public partial class PlayersTableManager : UserControl
     {
-        public Win2Player()
+        public PlayersTableManager()
         {
             InitializeComponent();
-            //
+            
+            /*
             CreatePlayers(6, "Player");
             ChangePlayerCard(0, 1);
             ChangePlayerCard(1, 4);
@@ -35,13 +36,20 @@ namespace Client
 
             ChangeNamePlayer("Ja", 0);
             ChangeNamePlayer("Jan", 3);
+            */
         }
 
-        private Image[] _imgPlayerCardArray = new Image[10];
-        private Label[] _labPlayerName = new Label[10];
-        public enum NameOfBack {palm, wood, bokeh}
+        public PlayersTableManager(byte numbersOfPlayers)
+        {
+            InitializeComponent();
+            CreatePlayers(numbersOfPlayers, "Player");
+        }
 
-        private void ChangePlayerCard(byte nrPlayer, byte cardNr)
+        private static Image[] _imgPlayerCardArray = new Image[10];
+        private static Label[] _labPlayerName = new Label[10];
+        public enum NameOfBackground {Palm, Wood, Bokeh}
+
+        public static void ChangePlayerCard(byte nrPlayer, byte cardNr)
         {
          _imgPlayerCardArray[nrPlayer].Source =
             new BitmapImage(
@@ -51,10 +59,10 @@ namespace Client
         private void CreatePlayers(byte playersNumber, string name)
         {
             var distance = (2 * Math.PI) / playersNumber;
-            
+            var radius = 0.75 * (GridPlayer.Height - 10);
+
             for (byte num=0; num<playersNumber; num++)
             {
-                var radius = 0.7*(GridPlayer.Height - 10);
                 var pos = distance*num;
                 var posY = -Math.Sin(pos + 1.5*Math.PI) * radius;
                 var posX = -Math.Cos(pos + 0.5*Math.PI) * radius;
@@ -83,7 +91,7 @@ namespace Client
             }
         }
 
-        private void ChangeNamePlayer(string name, byte numer)
+        public static void ChangeNamePlayer(string name, byte numer)
         {
             _labPlayerName[numer].Content = name;
         }
