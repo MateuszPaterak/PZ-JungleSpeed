@@ -1,0 +1,18 @@
+﻿<UserControl x:Class="Client.LogoPicture"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d" 
+             x:Name="LogoPictureControl"
+             d:DesignHeight="500" d:DesignWidth="500">
+    <Grid Margin="0,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center">
+        <Button x:Name="BtMenuImg" Height="500" Width="500" Click="BtMenuImg_Click">
+            <Button.Template>
+                <ControlTemplate>
+                    <Image Width="500" Height="500" Source="/Pictures/menu.png" Stretch="Fill" HorizontalAlignment="Center" Margin="0,0,0,10" />
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+    </Grid>
+</UserControl>

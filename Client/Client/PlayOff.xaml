@@ -1,0 +1,47 @@
+﻿<Window x:Class="Client.PlayOff"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Client"
+        mc:Ignorable="d"
+        Title="Dogrywka papier-kamień-norzyce" Height="300" Width="500">
+    <Grid>
+        <Grid.Background>
+            <ImageBrush ImageSource="Pictures/palm.jpg"/>
+        </Grid.Background>
+        <Label x:Name="Label" Content="Wybierz jedną kartę" HorizontalAlignment="Left" Margin="107,10,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="24" FontFamily="SketchFlow Print">
+            <Label.Background>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="Black" Offset="1"/>
+                    <GradientStop Color="White" Offset="0.59"/>
+                </LinearGradientBrush>
+            </Label.Background>
+        </Label>
+        <Button x:Name="BtPaper" Content="Button" HorizontalAlignment="Left" Height="150" Margin="10,55,0,0" VerticalAlignment="Top" Width="150" Click="btPaper_Click">
+            <Button.Template>
+                <ControlTemplate>
+                    <Image Width="120" Height="120" Source="/Pictures/IconPaper.png" Stretch="Fill" HorizontalAlignment="Center" Margin="0,0,0,10" />
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+        <Button x:Name="BtRock"  BorderBrush="Red" BorderThickness="50" Content="Button" HorizontalAlignment="Left" Height="150" Margin="172,55,0,0" VerticalAlignment="Top" Width="150" Click="btRock_Click">
+            <Button.Template>
+                <ControlTemplate>
+                    <Image Width="120" Height="120" Source="/Pictures/IconRock.png" Stretch="Fill" HorizontalAlignment="Center" Margin="0,0,0,10" />
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+        <Button x:Name="BtScissors" Content="Button" Height="150" Margin="332,55,0,0" VerticalAlignment="Top" Click="btScissors_Click" HorizontalAlignment="Left" Width="150">
+            <Button.Template >
+                <ControlTemplate>
+                    <Image Width="120" Height="120" Source="/Pictures/IconCut.png" Stretch="Fill" HorizontalAlignment="Center" Margin="0,0,0,10" />
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+        <Label x:Name="Label1" Content="Icon designed by Freepik" HorizontalAlignment="Left" Margin="340,234,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="BtCancel" Content="Anuluj wybór" HorizontalAlignment="Left" Margin="10,238,0,0" VerticalAlignment="Top" Width="100"/>
+        <Button x:Name="BtConfirm" Content="Potwierdź wybór" HorizontalAlignment="Left" Margin="127,238,0,0" VerticalAlignment="Top" Width="100"/>
+
+    </Grid>
+</Window>
