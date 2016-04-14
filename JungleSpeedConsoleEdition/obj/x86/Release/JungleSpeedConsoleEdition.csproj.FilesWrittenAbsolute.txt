@@ -1,0 +1,5 @@
+/home/wilq/Dokumenty/Projekty/JungleSpeed/JungleSpeedConsoleEdition/JungleSpeedConsoleEdition/obj/x86/Release/.NETFramework,Version=v4.5.AssemblyAttribute.cs
+/home/wilq/Dokumenty/Projekty/JungleSpeed/JungleSpeedConsoleEdition/JungleSpeedConsoleEdition/bin/Release/JungleSpeedConsoleEdition.exe.mdb
+/home/wilq/Dokumenty/Projekty/JungleSpeed/JungleSpeedConsoleEdition/JungleSpeedConsoleEdition/bin/Release/JungleSpeedConsoleEdition.exe
+/home/wilq/Dokumenty/Projekty/JungleSpeed/JungleSpeedConsoleEdition/JungleSpeedConsoleEdition/obj/x86/Release/JungleSpeedConsoleEdition.exe
+/home/wilq/Dokumenty/Projekty/JungleSpeed/JungleSpeedConsoleEdition/JungleSpeedConsoleEdition/obj/x86/Release/JungleSpeedConsoleEdition.exe.mdb
