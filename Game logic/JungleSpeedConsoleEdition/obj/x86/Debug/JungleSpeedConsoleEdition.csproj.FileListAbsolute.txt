@@ -1,0 +1,5 @@
+C:\Users\wilqdgc\Documents\Projekty\JungleSpeedConsoleEdition\JungleSpeedConsoleEdition\obj\x86\Debug\JungleSpeedConsoleEdition.exe
+C:\Users\wilqdgc\Documents\Projekty\JungleSpeedConsoleEdition\JungleSpeedConsoleEdition\bin\Debug\JungleSpeedConsoleEdition.exe
+C:\Users\wilqdgc\Documents\Projekty\JungleSpeedConsoleEdition\JungleSpeedConsoleEdition\bin\Debug\JungleSpeedConsoleEdition.pdb
+C:\Users\wilqdgc\Documents\Projekty\JungleSpeedConsoleEdition\JungleSpeedConsoleEdition\obj\x86\Debug\JungleSpeedConsoleEdition.csprojResolveAssemblyReference.cache
+C:\Users\wilqdgc\Documents\Projekty\JungleSpeedConsoleEdition\JungleSpeedConsoleEdition\obj\x86\Debug\JungleSpeedConsoleEdition.pdb
