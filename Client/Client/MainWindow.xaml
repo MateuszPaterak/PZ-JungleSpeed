@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Client"
         mc:Ignorable="d"
-        Title="Jungle Speed" Height="700" Width="900">
+        Title="Wojna o totem" Height="700" Width="900">
     <Grid>
         <Grid.Background>
             <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
@@ -25,7 +25,7 @@
         <ContentControl x:Name="CUserControl" Grid.Row="0" Margin="10,35,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="500" Width="500"/>
         <Button x:Name="BtGetUpCard" Content="Podnieś &#xD;&#xA;kartę" HorizontalAlignment="Left" Margin="535,48,0,0" VerticalAlignment="Top" Width="80" Height="50" Click="BtGetUpCard_Click"/>
         <Button x:Name="BtGetTotem" Content="Weź&#xD;&#xA;totem" HorizontalAlignment="Left" Margin="535,130,0,0" VerticalAlignment="Top" Width="80" Height="50" Click="BtGetTotem_Click"/>
-        <Button x:Name="BtOutOfGameplay" Content="Opóść&#xD;&#xA;rozgrywkę" HorizontalAlignment="Left" Margin="535,275,0,0" VerticalAlignment="Top" Width="80" Height="50" Click="BtOutOfGameplay_Click"/>
+        <Button x:Name="BtOutOfGameplay" Content="Opuść&#xD;&#xA;rozgrywkę" HorizontalAlignment="Left" Margin="535,275,0,0" VerticalAlignment="Top" Width="80" Height="50" Click="BtOutOfGameplay_Click"/>
         <ListView x:Name="ListView" HorizontalAlignment="Left" Height="277" Margin="637,48,0,0" VerticalAlignment="Top" Width="239">
             <ListView.View>
                 <GridView>
@@ -34,6 +34,6 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        
+
     </Grid>
 </Window>

@@ -9,6 +9,6 @@
         <Grid.Background>
             <ImageBrush x:Name="ImgBackground" ImageSource="Pictures/bokeh.jpg"/>
         </Grid.Background>
-        <Image x:Name="ImgTotem" Source="/Pictures/totem.png" HorizontalAlignment="Center" Height="150" Margin="0,0,0,0" VerticalAlignment="Center" Width="Auto"/>
+        <Image x:Name="ImgTotem" Source="/Pictures/totem.png" HorizontalAlignment="Center" Height="150" Margin="0,0,0,0" VerticalAlignment="Center" Width="Auto" />
     </Grid>
 </UserControl>

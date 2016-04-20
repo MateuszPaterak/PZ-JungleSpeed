@@ -1,18 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Client
 {
@@ -24,42 +14,135 @@ namespace Client
         public PlayersTableManager()
         {
             InitializeComponent();
-            
-            /*
-            CreatePlayers(6, "Player");
-            ChangePlayerCard(0, 1);
-            ChangePlayerCard(1, 4);
-            ChangePlayerCard(2, 3);
-            ChangePlayerCard(3, 2);
-            ChangePlayerCard(4, 2);
-            ChangePlayerCard(5, 4);
 
-            ChangeNamePlayer("Ja", 0);
-            ChangeNamePlayer("Jan", 3);
-            */
+            CreatePlayersAndLabel(2, "Player");
         }
 
         public PlayersTableManager(byte numbersOfPlayers)
         {
             InitializeComponent();
-            CreatePlayers(numbersOfPlayers, "Player");
+
+            CreatePlayersAndLabel(numbersOfPlayers, "Player");
+            ChangeBackground("palm");
+            //CreateLabel(numbersOfPlayers,"Player");
+            //CreatePlayer(numbersOfPlayers);
         }
 
         private static Image[] _imgPlayerCardArray = new Image[10];
         private static Label[] _labPlayerName = new Label[10];
         public enum NameOfBackground {Palm, Wood, Bokeh}
+        private static Random rng = new Random();
 
         public static void ChangePlayerCard(byte nrPlayer, byte cardNr)
         {
-         _imgPlayerCardArray[nrPlayer].Source =
-            new BitmapImage(
-                new Uri(@"/Pictures/Cards/" + cardNr.ToString() + ".png", UriKind.Relative));
+            try
+            {
+                _imgPlayerCardArray[nrPlayer].Source =
+                 new BitmapImage(
+                         new Uri(@"/Pictures/Cards/" + cardNr.ToString() + ".png", UriKind.Relative));
+            }
+            catch (NullReferenceException)
+            {
+            }
+         
         }
 
-        private void CreatePlayers(byte playersNumber, string name)
+        public static void ChangeCardRotation(byte nrPlayer, int angle)
+        {
+            RotateTransform rot = new RotateTransform(angle, _imgPlayerCardArray[nrPlayer].Width/2, _imgPlayerCardArray[nrPlayer].Height/2);
+            _imgPlayerCardArray[nrPlayer].RenderTransform = rot;
+
+        }
+
+        public static void ChangeCardRandomRotation(byte nrPlayer)
+        {
+            try
+            {
+                int angle = rng.Next(0, 360);
+
+                RotateTransform rot = new RotateTransform(angle, _imgPlayerCardArray[nrPlayer].Width/2,
+                    _imgPlayerCardArray[nrPlayer].Height/2);
+
+                _imgPlayerCardArray[nrPlayer].RenderTransform = rot;
+            }
+            catch (Exception e)
+            {
+                
+            }
+
+        }
+        private void CreateLabel(byte playersNumber, string name)
         {
             var distance = (2 * Math.PI) / playersNumber;
             var radius = 0.75 * (GridPlayer.Height - 10);
+
+            for (byte num = 0; num < playersNumber; num++)
+            {
+                var pos = distance * num;
+                var posY = -Math.Sin(pos + 1.5 * Math.PI) * radius;
+                var posX = -Math.Cos(pos + 0.5 * Math.PI) * radius;
+                
+                var lab = new Label
+                {
+                    Content = name + num,
+                    Margin = new Thickness(posX, posY - 120, 0, 0),
+                    Background = Brushes.DarkGray,
+                    Height = 30,
+                    Width = 100,
+                };
+
+                _labPlayerName[num] = lab;
+                GridPlayer.Children.Add(lab);
+            }
+        }
+
+        private void CreatePlayer(byte playersNumber)
+        {
+            var distance = (2 * Math.PI) / playersNumber;
+            var radius = 0.75 * (GridPlayer.Height - 10);
+
+            for (byte num = 0; num < playersNumber; num++)
+            {
+                var pos = distance * num;
+                var posY = -Math.Sin(pos + 1.5 * Math.PI) * radius;
+                var posX = -Math.Cos(pos + 0.5 * Math.PI) * radius;
+
+                var card = new Image
+                {
+                    Name = "ImgCardPlayer" + num.ToString(),
+                    Width = 100,
+                    Height = 100,
+                    Margin = new Thickness(posX, posY + 30, 0, 0),
+                };
+
+                _imgPlayerCardArray[num] = card;
+                GridPlayer.Children.Add(card);
+            }
+        }
+        private void CreatePlayersAndLabel(byte playersNumber, string name)
+        {
+            var distance = (2 * Math.PI) / playersNumber;
+            var radius = 0.75 * (GridPlayer.Height - 10);
+
+            for (byte num = 0; num < playersNumber; num++)
+            {
+                var pos = distance * num;
+                var posY = -Math.Sin(pos + 1.5 * Math.PI) * radius;
+                var posX = -Math.Cos(pos + 0.5 * Math.PI) * radius;
+
+                var lab = new Label
+                {
+                    Content = name + num,
+                    Margin = new Thickness(posX, posY - 120, 0, 0),
+                    Background = Brushes.DarkGray,
+                    Height = 30,
+                    Width = 100,
+                };
+                
+                _labPlayerName[num] = lab;
+                GridPlayer.Children.Add(lab);
+            }
+        
 
             for (byte num=0; num<playersNumber; num++)
             {
@@ -75,33 +158,40 @@ namespace Client
                         Margin =  new Thickness(posX, posY+30, 0, 0),
                     };
                 
-                var lab = new Label
-                {
-                    Content = name+num,
-                    Margin = new Thickness(posX, posY-120, 0, 0),
-                    Background = Brushes.DarkGray, 
-                    Height = 30,
-                    Width = 100,
-                };
-
                 _imgPlayerCardArray[num] = card;
-                _labPlayerName[num] = lab;
                 GridPlayer.Children.Add(card);
-                GridPlayer.Children.Add(lab);
             }
         }
 
         public static void ChangeNamePlayer(string name, byte numer)
         {
-            _labPlayerName[numer].Content = name;
+            try
+            {
+                _labPlayerName[numer].Content = name;
+            }
+            catch (NullReferenceException e)
+            {
+                
+            }
         }
 
-        /*private void ChangeBackround(String name)
+        private static void ChangeBackground(string name)
         {
-            ImgBackground.ImageSource = 
-                    new BitmapImage(
-                        new Uri(@"/Pictures/" + name + ".jpg", UriKind.Relative));
-        }*/
+            var background = new Image
+            {
+                Name = "ImgBackground",
+                Width = 100,
+                Height = 100,
+                Source = new BitmapImage(
+                    new Uri(@"/Pictures/" + name + ".png", UriKind.Relative)),
+            };
+            ImageBrush ib = new ImageBrush();
+            ib.ImageSource = new BitmapImage(new Uri("/Pictures/Cards/1.png", UriKind.Relative));
+            //GridPlayer.Background = new ImageBrush(new BitmapImage (new Uri("/Pictures/Cards/1.png", UriKind.Relative)));
+            Grid mygrid = new Grid();
+            mygrid.Background = ib;
+            //GridPlayer.Background = ib;
+        }
 
     }
 }

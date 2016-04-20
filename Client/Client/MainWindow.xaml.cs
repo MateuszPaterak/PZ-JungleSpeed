@@ -1,17 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Client
 {
@@ -60,14 +48,20 @@ namespace Client
 
         private void BtGetTotem_Click(object sender, RoutedEventArgs e)
         {
-
+            
             CUserControl.Content = new PlayersTableManager(8);
+            
             for (byte i = 0; i < 8; i++)
             {
-                PlayersTableManager.ChangeNamePlayer("Test", i );
+                PlayersTableManager.ChangeNamePlayer("Test", i);
+            }
+
+            for (byte i = 0; i < 8; i++)
+            {
                 byte tmp = Convert.ToByte( i%4 +1);
                 PlayersTableManager.ChangePlayerCard(i, tmp );
-
+                
+                PlayersTableManager.ChangeCardRandomRotation(i);
             }
             
         }
