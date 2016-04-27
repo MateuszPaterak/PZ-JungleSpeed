@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{14B064FB-A4DE-4D4E-A086-F86497E2450F}</ProjectGuid>
+    <ProjectGuid>{418BBB47-D83C-4ACF-8210-6186E730847C}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Client</RootNamespace>
-    <AssemblyName>Client</AssemblyName>
+    <RootNamespace>SerwerTest</RootNamespace>
+    <AssemblyName>SerwerTest</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -37,8 +37,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -57,23 +55,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="PlayOff.xaml.cs">
-      <DependentUpon>PlayOff.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UCMainScreen.xaml.cs">
-      <DependentUpon>UCMainScreen.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Win2Player.xaml.cs">
-      <DependentUpon>Win2Player.xaml</DependentUpon>
-    </Compile>
-    <Page Include="JoinRoom.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="LogoPicture.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -82,38 +63,12 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ContentWindow.cs" />
-    <Compile Include="JoinRoom.xaml.cs">
-      <DependentUpon>JoinRoom.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="LogoPicture.xaml.cs">
-      <DependentUpon>LogoPicture.xaml</DependentUpon>
-    </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="NewRoom.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="PlayOff.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UCMainScreen.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Win2Player.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="NewRoom.xaml.cs">
-      <DependentUpon>NewRoom.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -139,34 +94,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Pictures\menu.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Pictures\totem.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Pictures\wood.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Pictures\Cards\2.png" />
-    <Resource Include="Pictures\Cards\3.png" />
-    <Resource Include="Pictures\Cards\4.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Pictures\Cards\1.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Pictures\palm.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Pictures\bokeh.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Pictures\IconCut.png" />
-    <Resource Include="Pictures\IconPaper.png" />
-    <Resource Include="Pictures\IconRock.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

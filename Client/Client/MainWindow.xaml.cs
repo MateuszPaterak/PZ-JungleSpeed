@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Net.Sockets;
 using System.Windows;
 
 namespace Client
@@ -13,10 +15,13 @@ namespace Client
         {
             InitializeComponent();
 
-            CUserControl.Content = MyContentClassWindow.ChangeContent(ContNum.StartImg);
+            //CUserControl.Content = MyContentClassWindow.ChangeContent(ContNum.StartImg);
             //CUserControl.Content = MyContentClassWindow.ChangeContent(ContNum.PlayersBoard);
-
+            CUserControl.Content = new UCMainScreen();
         }
+
+        private TcpClient klient;
+        private BinaryReader ReadFromServer;
 
         private void NewRoom(object sender, RoutedEventArgs e)
         {
@@ -42,13 +47,32 @@ namespace Client
         private void BtGetUpCard_Click(object sender, RoutedEventArgs e)
         {
             //testy
-            PlayOff po = new PlayOff();
-            po.ShowDialog();
+            //PlayOff po = new PlayOff();
+            //po.ShowDialog();
+
+            string host = "127.0.0.1"; //textBox1.Text;
+            int port = 4000; //System.Convert.ToInt16(numericUpDown1.Value);
+            try
+            {
+                klient = new TcpClient(host, port);
+                ListView.Items.Add("Nawiązano połączenie z " + host + " na porcie: " + port);
+
+                ReadFromServer = new BinaryReader(klient.GetStream());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Błąd: Nie udało się nawiązać połączenia!");
+                //MessageBox.Show(ex.ToString());
+            }
+
+            MessageBox.Show(ReadFromServer.ReadString());
         }
 
         private void BtGetTotem_Click(object sender, RoutedEventArgs e)
         {
-            
+            klient.Close();
+            MessageBox.Show("Rozłączono klienta");
+            /*
             CUserControl.Content = new PlayersTableManager(8);
             
             for (byte i = 0; i < 8; i++)
@@ -63,7 +87,7 @@ namespace Client
                 
                 PlayersTableManager.ChangeCardRandomRotation(i);
             }
-            
+            */
         }
 
         private void BtOutOfGameplay_Click(object sender, RoutedEventArgs e)
