@@ -12,23 +12,6 @@ namespace Client
         public NewRoom()
         {
             InitializeComponent();
-/*
-            string host = "127.0.0.1"; //textBox1.Text;
-            int port = 4000; //System.Convert.ToInt16(numericUpDown1.Value);
-            try
-            {
-                TcpClient klient = new TcpClient(host, port);
-                //listBox1.Items.Add("Nawiązano połączenie z " + host + " na porcie: " + port);
-               
-                klient.Close();
-                MessageBox.Show("Nawiano połączenie");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Błąd: Nie udało się nawiązać połączenia!");
-                MessageBox.Show(ex.ToString());
-            }
-            */
         }
 
         private void BtCreateRoom_Click(object sender, RoutedEventArgs e)

@@ -16,8 +16,11 @@ namespace SerwerTest
             InitializeComponent();
         }
 
+        private int port;
         private TcpListener serwer;
         private TcpClient klient;
+        private BinaryWriter WriteToClient;
+        private BinaryReader ReadFromClient;
         private delegate void SetTextCallBack(string tekst);
 
         //obługa nasłuchiwania serwera
@@ -27,12 +30,26 @@ namespace SerwerTest
             klient = s.EndAcceptTcpClient(asyncResult); //kończy operację połączenia z klientem
             //TbDisplay.Text += ("Połączenie z kientem powiodło się. \n");
             ChangeToTbDisplay("Połączenie z kientem powiodło się. \n");  //wyświetl napis z odpowiedniego wątku 
-            //????? 
-            //klient.Close(); 
-            //serwer.Stop();
 
-            BinaryWriter WriteToClient = new BinaryWriter(klient.GetStream());
-            WriteToClient.Write("GetThisData");
+            WriteToClient = new BinaryWriter(klient.GetStream());
+            ReadFromClient = new BinaryReader(klient.GetStream());
+            //WriteToClient.Write("GetThisData");
+            while (true)
+            {
+                string data = null;
+                try
+                {
+                     data = ReadFromClient.ReadString();
+                }
+                catch (Exception ex)
+                {
+                    
+                }
+            
+            if(data != null)
+                ChangeToTbDisplay("Odebrano: " + data + "\n");
+            
+            }
         }
 
         private void ChangeToTbDisplay(string tekst) //przełączenie się na wątek obsługujący listBoxa z innego wątku
@@ -52,7 +69,8 @@ namespace SerwerTest
 
         private void BtExecute_Click(object sender, RoutedEventArgs e)
         {
-
+            WriteToClient.Write(TbCommand.Text.ToString());
+            TbCommand.Text = "";
         }
 
         private void BtListen_Click(object sender, RoutedEventArgs e)
@@ -70,7 +88,7 @@ namespace SerwerTest
                 return;
             }
 
-            int port = System.Convert.ToInt16(TbPort.Text);
+            port = System.Convert.ToInt16(TbPort.Text);
             //int port = System.Convert.ToInt16(4000);
             try
             {

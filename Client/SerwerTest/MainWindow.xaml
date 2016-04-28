@@ -8,9 +8,9 @@
         Title="MainWindow" Height="350" Width="525">
     <Grid Background="#FF3C3B3B">
         <Button x:Name="BtListen" Content="Rozpocznij &#xD;&#xA;nasłuch" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="75" Click="BtListen_Click"/>
-        <TextBox x:Name="TbDisplay" HorizontalAlignment="Left" Height="116" Margin="246,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="261"/>
-        <TextBox x:Name="TbCommand" HorizontalAlignment="Left" Height="39" Margin="246,158,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="194"/>
-        <Button x:Name="BtExecute" Content="Wykonaj" HorizontalAlignment="Left" Margin="442,158,0,0" VerticalAlignment="Top" Width="75" Height="39" Click="BtExecute_Click"/>
+        <TextBox x:Name="TbDisplay" HorizontalAlignment="Left" Height="256" Margin="246,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="261" VerticalScrollBarVisibility="Auto"/>
+        <TextBox x:Name="TbCommand" HorizontalAlignment="Left" Height="39" Margin="246,271,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="194"/>
+        <Button x:Name="BtExecute" Content="Wykonaj" HorizontalAlignment="Left" Margin="442,271,0,0" VerticalAlignment="Top" Width="75" Height="39" Click="BtExecute_Click"/>
         <TextBox x:Name="TbIP" HorizontalAlignment="Left" Height="24" Margin="90,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="151" Text="127.0.0.1"/>
         <TextBox x:Name="TbPort" HorizontalAlignment="Left" Height="25" Margin="90,39,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="151" Text="4000"/>
         <Button x:Name="BrStopServer" Content="Stop serwera" HorizontalAlignment="Left" Height="34" Margin="10,48,0,0" VerticalAlignment="Top" Width="75" Click="BrStopServer_Click" />

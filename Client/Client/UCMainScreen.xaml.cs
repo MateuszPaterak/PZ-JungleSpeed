@@ -37,8 +37,13 @@ namespace Client
 
         private void BtJoinToServer_Click(object sender, RoutedEventArgs e)
         {
-            JoinRoom joinToRoom = new JoinRoom();
-            joinToRoom.ShowDialog();
+            //JoinRoom joinToRoom = new JoinRoom();
+            //joinToRoom.ShowDialog();
+
+            Network.ConnectToServer();
+            GameClass.SetGameMode(GameMode.On);
+            //GameClass.GameLoop();
+            //CUserControl.Content = MyContentClassWindow.ChangeContent(ContNum.PlayersBoard);
         }
     }
 }
