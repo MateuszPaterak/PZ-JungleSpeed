@@ -171,7 +171,7 @@ namespace Client
             }
             catch (NullReferenceException e)
             {
-                
+                _labPlayerName[numer].Content = "Player";
             }
         }
 

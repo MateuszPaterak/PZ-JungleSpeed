@@ -10,45 +10,39 @@ namespace Client
     /// </summary>
     public partial class MainWindow : Window
     {
-        private int nr = 1;
         public MainWindow()
         {
             InitializeComponent();
-
+            CUserControl.Content = new UCMainScreen();
+            
             //CUserControl.Content = MyContentClassWindow.ChangeContent(ContNum.StartImg);
             //CUserControl.Content = MyContentClassWindow.ChangeContent(ContNum.PlayersBoard);
-            CUserControl.Content = new UCMainScreen();
         }
 
         
 
-        private void NewRoom(object sender, RoutedEventArgs e)
+        private void NewRoom(object sender, RoutedEventArgs e) //menu
         {
-            NewRoom createRoom = new NewRoom();
-
-            if (createRoom.ShowDialog() == true)
-            {
-
-            }
+            GameRoom.NewRoom();
         }
 
-        private void JoinToRoom(object sender, RoutedEventArgs e)
+        private void JoinToRoom(object sender, RoutedEventArgs e) //menu
         {
-            JoinRoom joinToRoom = new JoinRoom();
-            joinToRoom.ShowDialog();
+            GameRoom.JoinToRoom();
         }
 
         private void BtGetUpCard_Click(object sender, RoutedEventArgs e)
         {
+            Network.SendCommand(GameSendCommand.GetUpMyCard);
             //testy
             //PlayOff po = new PlayOff();
             //po.ShowDialog();
-            Network.SendCommand(GameSendCommand.GetUpMyCard);
         }
 
         private void BtGetTotem_Click(object sender, RoutedEventArgs e)
         {
             Network.SendCommand(GameSendCommand.GetTotem);
+
             /*
             CUserControl.Content = new PlayersTableManager(8);
             
@@ -69,8 +63,8 @@ namespace Client
 
         private void BtOutOfGameplay_Click(object sender, RoutedEventArgs e)
         {
-            Network.Disconnect();
-
+            Network.SendCommand(GameSendCommand.Disconnect);
+            
             /*
             nr = ((nr+=1)%9 ) + (nr/9)*2;
             CUserControl.Content = new PlayersTableManager(Convert.ToByte(nr));

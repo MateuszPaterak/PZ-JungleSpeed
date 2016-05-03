@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 
 namespace Client
 {
@@ -14,17 +15,23 @@ namespace Client
 
         private void btPaper_Click(object sender, RoutedEventArgs e)
         {
-
+            byte[] tab = new byte[1];
+            tab[0] = Convert.ToByte(1);
+            Network.SendCommand(GameSendCommand.PlayOff,tab);
         }
 
         private void btRock_Click(object sender, RoutedEventArgs e)
         {
-
+            byte[] tab = new byte[1];
+            tab[0] = Convert.ToByte(2);
+            Network.SendCommand(GameSendCommand.PlayOff, tab);
         }
 
         private void btScissors_Click(object sender, RoutedEventArgs e)
         {
-
+            byte[] tab = new byte[1];
+            tab[0] = Convert.ToByte(3);
+            Network.SendCommand(GameSendCommand.PlayOff, tab);
         }
     }
 }

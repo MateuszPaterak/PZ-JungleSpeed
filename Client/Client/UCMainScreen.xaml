@@ -7,10 +7,10 @@
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="500">
     <Grid>
-        <Button x:Name="BtNewServer" Content="Nowy serwer" HorizontalAlignment="Left" Height="79" Margin="26,41,0,0" VerticalAlignment="Top" Width="128" Click="BtNewServer_Click"/>
-        <Button x:Name="BtJoinToServer" Content="Dołącz do serwera" HorizontalAlignment="Left" Margin="338,41,0,0" VerticalAlignment="Top" Width="118" Height="79" Click="BtJoinToServer_Click"/>
-        <Label x:Name="LNick" Content="Podaj nick:" HorizontalAlignment="Left" Margin="26,160,0,0" VerticalAlignment="Top" Background="#FFB1E6A2"/>
-        <TextBox x:Name="TbPlayerName" HorizontalAlignment="Left" Height="41" Margin="26,191,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="182" Text="Player"/>
+        <Button x:Name="BtNewServer" Content="Nowy &#xD;&#xA;serwer" HorizontalAlignment="Left" Height="98" Margin="26,41,0,0" VerticalAlignment="Top" Width="151" Click="BtNewServer_Click" FontSize="20"/>
+        <Button x:Name="BtJoinToServer" Content="Dołącz &#xD;&#xA;do &#xD;&#xA;serwera" HorizontalAlignment="Left" Margin="307,41,0,0" VerticalAlignment="Top" Width="149" Height="98" Click="BtJoinToServer_Click" FontSize="20"/>
+        <Label x:Name="LNick" Content="Podaj nick:" HorizontalAlignment="Center" Margin="0,192,0,0" VerticalAlignment="Top" Background="#FFB1E6A2" FontSize="24"/>
+        <TextBox x:Name="TbPlayerName" HorizontalAlignment="Center" Height="41" Margin="0,239,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="245" Text="Player" FontSize="20"/>
 
     </Grid>
 </UserControl>

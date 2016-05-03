@@ -40,8 +40,8 @@
             </Button.Template>
         </Button>
         <Label x:Name="Label1" Content="Icon designed by Freepik" HorizontalAlignment="Left" Margin="340,234,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="BtCancel" Content="Anuluj wybór" HorizontalAlignment="Left" Margin="10,238,0,0" VerticalAlignment="Top" Width="100"/>
+        <!--<Button x:Name="BtCancel" Content="Anuluj wybór" HorizontalAlignment="Left" Margin="10,238,0,0" VerticalAlignment="Top" Width="100"/>
         <Button x:Name="BtConfirm" Content="Potwierdź wybór" HorizontalAlignment="Left" Margin="127,238,0,0" VerticalAlignment="Top" Width="100"/>
-
+-->
     </Grid>
 </Window>
