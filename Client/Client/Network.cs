@@ -9,7 +9,8 @@ namespace Client
     public class Network
     {
         public static TcpClient MyClient;
-        private static byte[] _byteData = new byte[100];
+        private static byte[] _byteDataSend = new byte[100];
+        private static byte[] _byteDataReceve = new byte[100];
         private static int port = 1000;
         private static string host = "127.0.0.1";
         
@@ -22,7 +23,7 @@ namespace Client
             }
             catch (Exception)
             {
-                MessageBox.Show("Nie udało się nawiązać połączenia!");
+                MessageBox.Show("Nie udało się nawiązać połączenia z serwerem");
             }
         }
 
@@ -32,38 +33,42 @@ namespace Client
             {
                 if (MyClient != null && MyClient.Connected)
                 {
-                    MyClient.Client.BeginReceive(_byteData,
+                    MyClient.Client.BeginReceive(
+                        _byteDataReceve,
                         0,
-                        _byteData.Length,
+                        _byteDataReceve.Length,
                         SocketFlags.None,
-                        OnReceive,
+                        OnReceiveLoop,
                         MyClient);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString());
+                //MessageBox.Show(ex.ToString());
             }
         }
 
-        private static void OnReceive(IAsyncResult arg)
+        private static void OnReceiveLoop(IAsyncResult arg)
         {
+            if (MyClient == null || !MyClient.Connected) return;
             try
             {
                 MyClient.Client.EndReceive(arg);
-               // MessageBox.Show("Odebrano od serwera: " + Encoding.UTF8.GetString(_byteData));
-                _byteData = new byte[100];
+                ReceiveComand();
+                // MessageBox.Show("Odebrano od serwera: " + Encoding.UTF8.GetString(_byteData));
+                _byteDataReceve = null;
 
-                MyClient.Client.BeginReceive(_byteData, //wait for new next messages
+                MyClient.Client.BeginReceive(
+                    _byteDataReceve, //wait for new next messages
                     0,
-                    _byteData.Length,
+                    _byteDataReceve.Length,
                     SocketFlags.None,
-                    OnReceive,
+                    OnReceiveLoop,
                     null);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Błąd odbioru danych. "+ex);
+                //MessageBox.Show("Błąd odbioru danych. "+ex);
             }
         }
 
@@ -71,10 +76,10 @@ namespace Client
         {
             if (MyClient!=null && MyClient.Connected)
             {
-                _byteData = new byte[2];
-                _byteData[1] = 53;//code
-                _byteData[0] = Convert.ToByte(_byteData.Length);
-                BeginSendComm(_byteData);
+                _byteDataSend = new byte[2];
+                _byteDataSend[1] = 53;//code
+                _byteDataSend[0] = Convert.ToByte(_byteDataSend.Length);
+                BeginSendComm(_byteDataSend);
 
                 MyClient.Close();
                 MessageBox.Show("Rozłączono z serwerem");
@@ -85,41 +90,164 @@ namespace Client
             }
         }
 
+        private static void ReceiveComand()
+        {
+            if(_byteDataReceve==null)   return;
+
+            switch (_byteDataReceve[1])
+            {
+                case 1:
+                    {//receive amount of card all players
+                        GameClass.ClearIdListPlayer();
+                        GameClass.ClearAmountOPlayerCards();
+                        var amountOfPlayers = _byteDataReceve[2];
+                        for (var i = 0; i < amountOfPlayers; i++)
+                            {
+                                var idPlayer = _byteDataReceve[3 + i*2];
+                                var amountOfCards = _byteDataReceve[4 + i*2];
+                                GameClass.AddPlayerAmountCard(idPlayer,amountOfCards);
+                            }
+                        break;
+                    }
+                case 2:
+                    {//receive list of player name in game
+                        GameClass.ClearNameOfPlayer();
+                        GameClass.ClearIdListPlayer();
+                        var amountOfPlayers = _byteDataReceve[2];
+                        var pointerToRead = 3;
+
+                        for (var i = 0; i < amountOfPlayers; i++)
+                        {
+
+                            int idPlayer = _byteDataReceve[pointerToRead];
+                            int lengthOfLogin = _byteDataReceve[pointerToRead+1];
+                            var login = new byte[lengthOfLogin];
+                            Array.Copy(_byteDataReceve, pointerToRead+2, login, 0, lengthOfLogin);
+                            GameClass.AddPlayersName(idPlayer, Encoding.UTF8.GetString(login));
+                            pointerToRead += (2 + lengthOfLogin);
+                        }
+                        break;
+                    }
+                case 3:
+                    {//enable button GetMyCard
+                        ((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = true;
+                        break;
+                    }
+                case 4:
+                    {//disable button GetMyCard
+                        ((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = false;
+                        break;
+                    }
+                case 5:
+                    {//display card at the player
+                        var idPlayer = _byteDataReceve[2];
+                        var idCard = _byteDataReceve[3];
+                        PlayersTableManager.ChangePlayerCard(idPlayer,idCard);
+                        PlayersTableManager.ChangeCardRandomRotation(idPlayer);
+                        break;
+                    }
+                case 6:
+                    {//message to winner of the fight for totem
+                        MessageBox.Show("Wygrałeś pojedynek o totem!!!");
+                        break;
+                    }
+                case 7:
+                    {//message to loser of the fight for totem
+                        MessageBox.Show("Przegrałeś pojedynek o totem!!!");
+                        break;
+                    }
+                case 8:
+                    {//list of room and ID
+                        GameRoom.ClearIdListRoom();
+                        GameRoom.ClearNameOfRoom();
+                        var amountOfRooms = _byteDataReceve[2];
+                        var pointerToRead = 3;
+
+                        for (var i = 0; i < amountOfRooms; i++)
+                        {
+                            int idRoom = _byteDataReceve[pointerToRead];
+                            int lengthOfName = _byteDataReceve[pointerToRead + 1];
+                            var name = new byte[lengthOfName];
+                            Array.Copy(_byteDataReceve, pointerToRead + 2, name, 0, lengthOfName);
+                            GameRoom.AddRoomAndId(idRoom,Encoding.UTF8.GetString(name));
+                            pointerToRead += (2 + lengthOfName);
+                        }
+                        break;
+                    }
+                case 9:
+                    {//list of player name +ID in room
+                        GameRoom.ClearNameOfPlayers();
+                        GameRoom.ClearIdListPlayerInRoom();
+                        var amountOfPlayers = _byteDataReceve[2];
+                        var pointerToRead = 3;
+
+                        for (var i = 0; i < amountOfPlayers; i++)
+                        {
+                            int idPlayer = _byteDataReceve[pointerToRead];
+                            int lengthOfLogin = _byteDataReceve[pointerToRead + 1];
+                            var login = new byte[lengthOfLogin];
+                            Array.Copy(_byteDataReceve, pointerToRead + 2, login, 0, lengthOfLogin);
+                            GameRoom.AddPlayerNameInRoom(idPlayer, Encoding.UTF8.GetString(login));
+                            pointerToRead += (2 + lengthOfLogin);
+                        }
+                        break;
+                    }
+                case 10:
+                    {//list of players+ID to start game in room
+                        GameRoom.ClearIdListPlayerToStartGame();
+                        GameRoom.ClearNameOfPlayers();
+                        var amountOfPlayers = _byteDataReceve[2];
+                        var pointerToRead = 3;
+
+                        for (var i = 0; i < amountOfPlayers; i++)
+                        {
+                            int idPlayer = _byteDataReceve[pointerToRead];
+                            int lengthOfLogin = _byteDataReceve[pointerToRead + 1];
+                            var login = new byte[lengthOfLogin];
+                            Array.Copy(_byteDataReceve, pointerToRead + 2, login, 0, lengthOfLogin);
+                            GameRoom.AddPlayerToStartGame(idPlayer, Encoding.UTF8.GetString(login));
+                            pointerToRead += (2 + lengthOfLogin);
+                        }
+                        break;
+                    }
+
+            }
+        }
         public static void SendCommand(GameSendCommand command, byte[] arg=null)
         {
             switch (command)
             {
                 case GameSendCommand.GetTotem:
                 {
-                        _byteData = new byte[2];
-                        _byteData[1] = 50;//code
-                        _byteData[0] = Convert.ToByte(_byteData.Length);
+                        _byteDataSend = new byte[2];
+                        _byteDataSend[1] = 50;//code
+                        _byteDataSend[0] = Convert.ToByte(_byteDataSend.Length);
 
-                        BeginSendComm(_byteData);
+                        BeginSendComm(_byteDataSend);
                         break;
                 }
                 case GameSendCommand.PlayOff:
                     {
-                        _byteData = new byte[3];
+                        _byteDataSend = new byte[3];
                         if (arg != null)
                         {
-                            _byteData[2] = arg[0];
+                            _byteDataSend[2] = arg[0];
                         }
                         else
                         {
-                            _byteData[2] = Convert.ToByte(5);
+                            _byteDataSend[2] = Convert.ToByte(5);
                         }
-                        _byteData[1] = 51;//code
-                        _byteData[0] = Convert.ToByte(_byteData.Length);
-                        BeginSendComm(_byteData);
+                        _byteDataSend[1] = 51;//code
+                        _byteDataSend[0] = Convert.ToByte(_byteDataSend.Length);
+                        BeginSendComm(_byteDataSend);
                         break;
                     }
                 case GameSendCommand.GetUpMyCard:
                 {
-                        _byteData = new byte[2];
-                        _byteData[1] = 52;//code
-                        _byteData[0] = Convert.ToByte(_byteData.Length);
-                        BeginSendComm(_byteData);
+                        _byteDataSend = new byte[2];
+                        _byteDataSend[1] = 52;//code
+                        _byteDataSend[0] = Convert.ToByte(_byteDataSend.Length);
+                        BeginSendComm(_byteDataSend);
                         break;
                 }
                 case GameSendCommand.Disconnect:
@@ -134,95 +262,95 @@ namespace Client
                         byte[] namebyte = Encoding.UTF8.GetBytes(GameClass.MyPlayerName);
                         int len = namebyte.Length + 2;
 
-                        _byteData = new byte[len];
-                        _byteData[1] = 54;//code
-                        Array.Copy(namebyte, 0, _byteData, 2, _byteData.Length);
-                        _byteData[0] = Convert.ToByte(_byteData.Length);
+                        _byteDataSend = new byte[len];
+                        _byteDataSend[1] = 54;//code
+                        Array.Copy(namebyte, 0, _byteDataSend, 2, _byteDataSend.Length);
+                        _byteDataSend[0] = Convert.ToByte(_byteDataSend.Length);
                         
-                        BeginSendComm(_byteData);
+                        BeginSendComm(_byteDataSend);
                         break;
                     }
                 case GameSendCommand.GetListAllRoom:
                     {
-                        _byteData = new byte[2];
-                        _byteData[1] = 55;//code
-                        _byteData[0] = Convert.ToByte(_byteData.Length);
-                        BeginSendComm(_byteData);
+                        _byteDataSend = new byte[2];
+                        _byteDataSend[1] = 55;//code
+                        _byteDataSend[0] = Convert.ToByte(_byteDataSend.Length);
+                        BeginSendComm(_byteDataSend);
                         break;
                     }
                 case GameSendCommand.GetListAllPlayerInRoom:
                     {
-                        _byteData = new byte[3];
-                        _byteData[1] = 56;//code
+                        _byteDataSend = new byte[3];
+                        _byteDataSend[1] = 56;//code
                         if (arg == null)
                         {
-                            _byteData[2] = Convert.ToByte(255);
+                            _byteDataSend[2] = Convert.ToByte(255);
                         }
                         else
                         {
-                            _byteData[2] = arg[0];
+                            _byteDataSend[2] = arg[0];
                         }
-                        _byteData[0] = Convert.ToByte(_byteData.Length);
-                        BeginSendComm(_byteData);
+                        _byteDataSend[0] = Convert.ToByte(_byteDataSend.Length);
+                        BeginSendComm(_byteDataSend);
                         break;
                     }
                 case GameSendCommand.GetListAllPlayerInRoomToStartGame:
                     {
 
-                        _byteData = new byte[3];
-                        _byteData[1] = 57;//code
+                        _byteDataSend = new byte[3];
+                        _byteDataSend[1] = 57;//code
                         if (arg == null)
                         {
-                            _byteData[2] = Convert.ToByte(255);
+                            _byteDataSend[2] = Convert.ToByte(255);
                         }
                         else
                         {
-                            _byteData[2] = arg[0];
+                            _byteDataSend[2] = arg[0];
                         }
-                        _byteData[0] = Convert.ToByte(_byteData.Length);
-                        BeginSendComm(_byteData);
+                        _byteDataSend[0] = Convert.ToByte(_byteDataSend.Length);
+                        BeginSendComm(_byteDataSend);
                         break;
                     }
                 case GameSendCommand.JoinToRoom:
                     {
-                        _byteData = new byte[3];
-                        _byteData[1] = 58;//code
+                        _byteDataSend = new byte[3];
+                        _byteDataSend[1] = 58;//code
                         if (arg == null)
                         {
-                            _byteData[2] = Convert.ToByte(255);
+                            _byteDataSend[2] = Convert.ToByte(255);
                         }
                         else
                         {
-                            _byteData[2] = arg[0];
+                            _byteDataSend[2] = arg[0];
                         }
-                        _byteData[0] = Convert.ToByte(_byteData.Length);
-                        BeginSendComm(_byteData);
+                        _byteDataSend[0] = Convert.ToByte(_byteDataSend.Length);
+                        BeginSendComm(_byteDataSend);
                         break;
                     }
                 case GameSendCommand.ExitFromRoom:
                     {
 
-                        _byteData = new byte[2];
-                        _byteData[1] = 59;//code
-                        _byteData[0] = Convert.ToByte(_byteData.Length);
-                        BeginSendComm(_byteData);
+                        _byteDataSend = new byte[2];
+                        _byteDataSend[1] = 59;//code
+                        _byteDataSend[0] = Convert.ToByte(_byteDataSend.Length);
+                        BeginSendComm(_byteDataSend);
                         break;
                     }
                 case GameSendCommand.JoinToGameInRoom:
                     {
 
-                        _byteData = new byte[2];
-                        _byteData[1] = 60;//code
-                        _byteData[0] = Convert.ToByte(_byteData.Length);
-                        BeginSendComm(_byteData);
+                        _byteDataSend = new byte[2];
+                        _byteDataSend[1] = 60;//code
+                        _byteDataSend[0] = Convert.ToByte(_byteDataSend.Length);
+                        BeginSendComm(_byteDataSend);
                         break;
                     }
                 case GameSendCommand.ExitFromGameInRoom:
                     {
-                        _byteData = new byte[2];
-                        _byteData[1] = 61;//code
-                        _byteData[0] = Convert.ToByte(_byteData.Length);
-                        BeginSendComm(_byteData);
+                        _byteDataSend = new byte[2];
+                        _byteDataSend[1] = 61;//code
+                        _byteDataSend[0] = Convert.ToByte(_byteDataSend.Length);
+                        BeginSendComm(_byteDataSend);
                         break;
                     }
                 case GameSendCommand.CreateNewRoom:
@@ -230,44 +358,44 @@ namespace Client
                         byte[] namebyte = Encoding.UTF8.GetBytes(GameRoom.NameRoom);
                         int len = namebyte.Length + 2;
 
-                        _byteData = new byte[len];
-                        _byteData[1] = 62;//code
-                        Array.Copy(namebyte, 0, _byteData, 2, _byteData.Length);
-                        _byteData[0] = Convert.ToByte(_byteData.Length);
+                        _byteDataSend = new byte[len];
+                        _byteDataSend[1] = 62;//code
+                        Array.Copy(namebyte, 0, _byteDataSend, 2, _byteDataSend.Length);
+                        _byteDataSend[0] = Convert.ToByte(_byteDataSend.Length);
 
-                        BeginSendComm(_byteData);
+                        BeginSendComm(_byteDataSend);
                         break;
                     }
                 case GameSendCommand.CloseMyRoom:
                     {
-                        _byteData = new byte[2];
-                        _byteData[1] = 63;//code
-                        _byteData[0] = Convert.ToByte(_byteData.Length);
-                        BeginSendComm(_byteData);
+                        _byteDataSend = new byte[2];
+                        _byteDataSend[1] = 63;//code
+                        _byteDataSend[0] = Convert.ToByte(_byteDataSend.Length);
+                        BeginSendComm(_byteDataSend);
                         break;
                     }
                 case GameSendCommand.RemovePlayerFromRoom:
                     {
-                        _byteData = new byte[3];
-                        _byteData[1] = 64;//code
+                        _byteDataSend = new byte[3];
+                        _byteDataSend[1] = 64;//code
                         if (arg == null)
                         {
-                            _byteData[2] = Convert.ToByte(255);
+                            _byteDataSend[2] = Convert.ToByte(255);
                         }
                         else
                         {
-                            _byteData[2] = arg[0];
+                            _byteDataSend[2] = arg[0];
                         }
-                        _byteData[0] = Convert.ToByte(_byteData.Length);
-                        BeginSendComm(_byteData);
+                        _byteDataSend[0] = Convert.ToByte(_byteDataSend.Length);
+                        BeginSendComm(_byteDataSend);
                         break;
                     }
                 case GameSendCommand.StartGame:
                     {
-                        _byteData = new byte[2];
-                        _byteData[1] = 65;//code
-                        _byteData[0] = Convert.ToByte(_byteData.Length);
-                        BeginSendComm(_byteData);
+                        _byteDataSend = new byte[2];
+                        _byteDataSend[1] = 65;//code
+                        _byteDataSend[0] = Convert.ToByte(_byteDataSend.Length);
+                        BeginSendComm(_byteDataSend);
                         break;
                     }
             }
@@ -295,7 +423,7 @@ namespace Client
             try
             {
                 MyClient.Client.EndSend(arg);
-                _byteData = null;
+                _byteDataSend = null;
             }
             catch (Exception ex)
             {

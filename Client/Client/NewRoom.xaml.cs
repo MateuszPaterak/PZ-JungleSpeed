@@ -31,6 +31,7 @@ namespace Client
 
         private void BtStartGame_Click(object sender, RoutedEventArgs e)
         {
+            //odblkowanie dopiero gdy jest min dwóch graczy
             //...
             //start game
             //...

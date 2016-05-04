@@ -84,7 +84,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ContentWindow.cs" />
+    <Compile Include="MyContentClassWindow.cs" />
     <Compile Include="JoinRoom.xaml.cs">
       <DependentUpon>JoinRoom.xaml</DependentUpon>
     </Compile>
