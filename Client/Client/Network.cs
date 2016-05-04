@@ -56,7 +56,7 @@ namespace Client
                 MyClient.Client.EndReceive(arg);
                 ReceiveComand();
                 // MessageBox.Show("Odebrano od serwera: " + Encoding.UTF8.GetString(_byteData));
-                _byteDataReceve = null;
+                _byteDataReceve = null;                                             //->>>>problem with null
 
                 MyClient.Client.BeginReceive(
                     _byteDataReceve, //wait for new next messages
@@ -107,6 +107,7 @@ namespace Client
                                 var amountOfCards = _byteDataReceve[4 + i*2];
                                 GameClass.AddPlayerAmountCard(idPlayer,amountOfCards);
                             }
+                        GameRoom.StartGameFromJoinRoom(amountOfPlayers);
                         break;
                     }
                 case 2:
@@ -208,6 +209,12 @@ namespace Client
                             GameRoom.AddPlayerToStartGame(idPlayer, Encoding.UTF8.GetString(login));
                             pointerToRead += (2 + lengthOfLogin);
                         }
+                        break;
+                    }
+                case 11://todo
+                    {//end of game
+                        GameClass.ClearGameClass();
+                        ((MainWindow)Application.Current.MainWindow).CUserControl.Content = new UCMainScreen();
                         break;
                     }
 

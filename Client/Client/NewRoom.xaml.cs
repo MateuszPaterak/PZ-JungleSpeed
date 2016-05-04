@@ -31,13 +31,10 @@ namespace Client
 
         private void BtStartGame_Click(object sender, RoutedEventArgs e)
         {
-            //odblkowanie dopiero gdy jest min dwóch graczy
-            //...
-            //start game
-            //...
-
+            if (GameRoom.IdListPlayerToStartGame.Count < 2) return; //start when in room are min 2 players
+            
             DialogResult = true;
-            //this.Close();
+            this.Close();
         }
     }
 }

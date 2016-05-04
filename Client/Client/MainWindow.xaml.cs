@@ -18,8 +18,13 @@ namespace Client
             //CUserControl.Content = MyContentClassWindow.ChangeContent(ContNum.StartImg);
             //CUserControl.Content = MyContentClassWindow.ChangeContent(ContNum.PlayersBoard);
         }
+        public JoinRoom joinToRoom = new JoinRoom();
 
-        
+        public void CloseJoinRoomWindow()
+        {
+            joinToRoom.Close();
+        }
+
 
         private void NewRoom(object sender, RoutedEventArgs e) //menu
         {
