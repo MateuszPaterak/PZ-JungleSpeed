@@ -10,68 +10,44 @@ namespace Client
     /// </summary>
     public partial class MainWindow : Window
     {
-        private int nr = 1;
         public MainWindow()
         {
             InitializeComponent();
-
+            CUserControl.Content = new UCMainScreen();
+            
             //CUserControl.Content = MyContentClassWindow.ChangeContent(ContNum.StartImg);
             //CUserControl.Content = MyContentClassWindow.ChangeContent(ContNum.PlayersBoard);
-            CUserControl.Content = new UCMainScreen();
+        }
+        public JoinRoom joinToRoom = new JoinRoom();
+
+        public void CloseJoinRoomWindow()
+        {
+            joinToRoom.Close();
         }
 
-        private TcpClient klient;
-        private BinaryReader ReadFromServer;
 
-        private void NewRoom(object sender, RoutedEventArgs e)
+        private void NewRoom(object sender, RoutedEventArgs e) //menu
         {
-            NewRoom createRoom = new NewRoom();
-
-            if (createRoom.ShowDialog() == true)
-            {
-
-            }
+            GameRoom.NewRoom();
         }
 
-        private void JoinToRoom(object sender, RoutedEventArgs e)
+        private void JoinToRoom(object sender, RoutedEventArgs e) //menu
         {
-            JoinRoom joinToRoom = new JoinRoom();
-            joinToRoom.ShowDialog();
-        }
-
-        private void GameLoop()
-        {
-            
+            GameRoom.JoinToRoom();
         }
 
         private void BtGetUpCard_Click(object sender, RoutedEventArgs e)
         {
+            Network.SendCommand(GameSendCommand.GetUpMyCard);
             //testy
             //PlayOff po = new PlayOff();
             //po.ShowDialog();
-
-            string host = "127.0.0.1"; //textBox1.Text;
-            int port = 4000; //System.Convert.ToInt16(numericUpDown1.Value);
-            try
-            {
-                klient = new TcpClient(host, port);
-                ListView.Items.Add("Nawiązano połączenie z " + host + " na porcie: " + port);
-
-                ReadFromServer = new BinaryReader(klient.GetStream());
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Błąd: Nie udało się nawiązać połączenia!");
-                //MessageBox.Show(ex.ToString());
-            }
-
-            MessageBox.Show(ReadFromServer.ReadString());
         }
 
         private void BtGetTotem_Click(object sender, RoutedEventArgs e)
         {
-            klient.Close();
-            MessageBox.Show("Rozłączono klienta");
+            Network.SendCommand(GameSendCommand.GetTotem);
+
             /*
             CUserControl.Content = new PlayersTableManager(8);
             
@@ -92,6 +68,9 @@ namespace Client
 
         private void BtOutOfGameplay_Click(object sender, RoutedEventArgs e)
         {
+            Network.SendCommand(GameSendCommand.Disconnect);
+            
+            /*
             nr = ((nr+=1)%9 ) + (nr/9)*2;
             CUserControl.Content = new PlayersTableManager(Convert.ToByte(nr));
             for (int i = 0; i < nr; i++)
@@ -101,6 +80,7 @@ namespace Client
                 PlayersTableManager.ChangePlayerCard(Convert.ToByte(i), tmp);
 
             }
+            */
         }
     }
 }

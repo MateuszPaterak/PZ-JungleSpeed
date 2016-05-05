@@ -5,7 +5,8 @@ namespace Client
     public enum ContNum : byte
     {
         StartImg,
-        PlayersBoard
+        PlayersBoard,
+        StartPanel,
     };
     public static class MyContentClassWindow
     {
@@ -21,6 +22,10 @@ namespace Client
                     case ContNum.PlayersBoard:
                 {
                     return new PlayersTableManager();
+                }
+                case ContNum.StartPanel:
+                {
+                    return new UCMainScreen();
                 }
                 default:
                 {

@@ -57,14 +57,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="GameClass.cs" />
+    <Compile Include="Network.cs" />
     <Compile Include="PlayOff.xaml.cs">
       <DependentUpon>PlayOff.xaml</DependentUpon>
     </Compile>
     <Compile Include="UCMainScreen.xaml.cs">
       <DependentUpon>UCMainScreen.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Win2Player.xaml.cs">
-      <DependentUpon>Win2Player.xaml</DependentUpon>
+    <Compile Include="UCPlayersTableManager.xaml.cs">
+      <DependentUpon>UCPlayersTableManager.xaml</DependentUpon>
     </Compile>
     <Page Include="JoinRoom.xaml">
       <SubType>Designer</SubType>
@@ -82,7 +84,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ContentWindow.cs" />
+    <Compile Include="MyContentClassWindow.cs" />
     <Compile Include="JoinRoom.xaml.cs">
       <DependentUpon>JoinRoom.xaml</DependentUpon>
     </Compile>
@@ -105,7 +107,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Win2Player.xaml">
+    <Page Include="UCPlayersTableManager.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -1,7 +1,8 @@
 ﻿using System;
-using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Windows;
 
 namespace SerwerTest
@@ -16,90 +17,198 @@ namespace SerwerTest
             InitializeComponent();
         }
 
-        private TcpListener serwer;
-        private TcpClient klient;
-        private delegate void SetTextCallBack(string tekst);
+        private int _port;
+        private TcpListener _server;
+        private TcpClient _client;
+        //private BinaryWriter WriteToClient;
+        //private BinaryReader ReadFromClient;
+        private delegate void DelegForTextCallBack(string tekst);
+        private byte[] _byteData = new byte[100];
 
-        //obługa nasłuchiwania serwera
-        private void AcceptTcpClientCallback(IAsyncResult asyncResult) //metoda zwrotna wykonywana w momencie połączenia z klientem
-        {
-            TcpListener s = (TcpListener)asyncResult.AsyncState; //lokalny obiekt serwera komunikujący się z klientem 
-            klient = s.EndAcceptTcpClient(asyncResult); //kończy operację połączenia z klientem
-            //TbDisplay.Text += ("Połączenie z kientem powiodło się. \n");
-            ChangeToTbDisplay("Połączenie z kientem powiodło się. \n");  //wyświetl napis z odpowiedniego wątku 
-            //????? 
-            //klient.Close(); 
-            //serwer.Stop();
-
-            BinaryWriter WriteToClient = new BinaryWriter(klient.GetStream());
-            WriteToClient.Write("GetThisData");
-        }
-
-        private void ChangeToTbDisplay(string tekst) //przełączenie się na wątek obsługujący listBoxa z innego wątku
+        private void WriteToTbDisplay(string msg) //przełączenie się na wątek obsługujący listBoxa z innego wątku
         {
             if (!TbDisplay.Dispatcher.CheckAccess())
                 //sprawdzenie czy jest się w wątku obsługującym tę kontrolkę, 
                 //jeśli nie to trzeba w dalszym kroku przełączyć się na niego
             {
-                SetTextCallBack f = new SetTextCallBack(ChangeToTbDisplay); //utwórz wskaźnik na tą bieżącą funkcję
-                Dispatcher.Invoke(f, new object[] { tekst });  //przełączenie się na wątek naszej kontrolki
+                DelegForTextCallBack f = WriteToTbDisplay; //utwórz wskaźnik na tą bieżącą funkcję
+                Dispatcher.Invoke(f, msg);  //przełączenie się na wątek naszej kontrolki
             }
             else
             {
-                TbDisplay.Text += (tekst);
+                TbDisplay.Text += (msg);
             }
+        }
+
+        private void WriteToTbDisplayNewline(string msg)
+        {
+            msg += "\n";
+            WriteToTbDisplay(msg);
         }
 
         private void BtExecute_Click(object sender, RoutedEventArgs e)
         {
+            //WriteToClient.Write(TbCommand.Text.ToString());
+            try
+            {
+                _byteData = new byte[100];
+                _byteData = Encoding.UTF8.GetBytes(TbCommand.Text);
 
+                _client.Client.BeginSend(
+                    _byteData,
+                    0,
+                    _byteData.Length,
+                    SocketFlags.None,
+                    SendToClient,
+                    null);
+
+                _byteData = new byte[100];
+                TbCommand.Text = "";
+            }
+            catch (Exception ex)
+            {
+                WriteToTbDisplayNewline("Błąd podczas wysyłania: "+ ex);
+            }
+        }
+
+        private void SendToClient(IAsyncResult arg)
+        {
+            try
+            {
+                _client.Client.EndSend(arg);
+            }
+            catch (Exception ex)
+            {
+                WriteToTbDisplayNewline("Błąd wysłania danych. " + ex);
+            }
         }
 
         private void BtListen_Click(object sender, RoutedEventArgs e)
         {
-            TbDisplay.Text += ("Oczekiwanie na połączenie ...\n");
-            IPAddress adresIP;
+            IPAddress adresIp;
             try
             {
-                adresIP = IPAddress.Parse(TbIP.Text);
+                adresIp = IPAddress.Parse(TbIP.Text);
             }
-            catch
+            catch(Exception ex)
             {
-                MessageBox.Show("Błędny format adresu IP!");
-                TbIP.Text = String.Empty;
+                WriteToTbDisplayNewline("Błędny format adresu IP! " + ex);
+                TbIP.Text = string.Empty;
                 return;
             }
 
-            int port = System.Convert.ToInt16(TbPort.Text);
-            //int port = System.Convert.ToInt16(4000);
+            _port = Convert.ToInt16(TbPort.Text);
+
             try
             {
-                serwer = new TcpListener(adresIP, port);
-                serwer.Start();
-                serwer.BeginAcceptTcpClient(
-                    new AsyncCallback(AcceptTcpClientCallback),
-                    serwer); //asynchroniczne nasłuchiwanie 
-                TbDisplay.Text += "Serwer wystartował.\n";
+                _server = new TcpListener(adresIp, _port);
+                _server.Start();
+                _server.BeginAcceptTcpClient(
+                    AcceptTcpClientCallback,
+                    _server); //asynchroniczne nasłuchiwanie na nadejście klienta
+                WriteToTbDisplayNewline("Serwer wystartował.");
+                WriteToTbDisplayNewline("Oczekiwanie na połączenie ...");
             }
             catch (Exception ex)
             {
-                TbDisplay.Text +=("Błąd: " + ex.Message+"\n");
+                WriteToTbDisplayNewline("Błąd: " + ex.Message);
             }
         }
-        
+
+        //obługa nasłuchiwania serwera
+        private void AcceptTcpClientCallback(IAsyncResult asyncResult) //metoda zwrotna wykonywana w momencie połączenia z klientem
+        {
+            try
+            {
+                TcpListener serv = (TcpListener) asyncResult.AsyncState; //lokalny obiekt serwera komunikujący się z klientem 
+                _client = serv.EndAcceptTcpClient(asyncResult); //kończy operację połączenia z klientem
+                WriteToTbDisplayNewline("Połączenie z klientem powiodło się."); //wyświetl napis z odpowiedniego wątku 
+
+                //WriteToClient = new BinaryWriter(client.GetStream());
+                //ReadFromClient = new BinaryReader(client.GetStream());
+                //WriteToClient.Write("GetThisData");
+            }
+            catch (Exception ex)
+            {
+                //WriteToTbDisplayNewline(ex.ToString());
+            }
+
+
+            //run reveive data mode
+            if (_client == null || !_client.Connected) return;
+            try
+            {
+                _client.Client.BeginReceive(_byteData,
+                    0,
+                    _byteData.Length,
+                    SocketFlags.None,
+                    ReceiveDataFromClient,
+                    _client);
+            }
+            catch (Exception ex)
+            {
+                WriteToTbDisplayNewline("Błąd odbiarania danych: " + ex);
+            }
+        }
+
+        private void ReceiveDataFromClient(IAsyncResult arg)
+        {
+            if (!_client.Connected || _client == null) return;
+            try
+            {
+                _client.Client.EndReceive(arg);
+
+
+                byte[] arraytmp = new byte[15];
+                Array.Copy(_byteData, arraytmp, 15);
+                WriteToTbDisplayNewline("Odebrano od klienta: " + Encoding.UTF8.GetString(arraytmp));
+
+                _byteData = new byte[100];
+
+                _client.Client.BeginReceive(_byteData, //wait for new next messages
+                    0,
+                    _byteData.Length,
+                    SocketFlags.None,
+                    ReceiveDataFromClient,
+                    null);
+
+            }
+            catch (Exception ex)
+            {
+                WriteToTbDisplayNewline("Błąd odbioru danych. " + ex);
+            }
+        }
+
         private void BrStopServer_Click(object sender, RoutedEventArgs e)
         {
-            if (serwer != null)
+            if (_server != null)//&& _server.Server.Connected
             {
-                serwer.Stop();
-                TbDisplay.Text += "Zakończono pracę serwera\n";
+                try
+                {
+                    _server.Stop();
+                    _server = null;
+                    WriteToTbDisplayNewline("Zakończono pracę serwera");
+                }
+                catch (Exception ex)
+                {
+                    WriteToTbDisplayNewline(ex.ToString());
+                }
             }
-            if (klient != null)
+            if (_client != null )//&& _client.Connected
             {
-                klient.Close();
-                TbDisplay.Text += "Zakończono pracę klienta\n";
+                try
+                {
+                    _client.Close();
+                    //ReadFromClient = null;
+                    //WriteToClient = null;
+                    _client = null;
+                    WriteToTbDisplayNewline("Zakończono pracę klienta");
+                }
+                catch (Exception ex)
+                {
+                    WriteToTbDisplayNewline(ex.ToString());
+                }
             }
-            
         }
     }
 }

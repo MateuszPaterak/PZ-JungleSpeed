@@ -24,21 +24,21 @@ namespace Client
         {
             InitializeComponent();
         }
-
+        
         private void BtNewServer_Click(object sender, RoutedEventArgs e)
         {
-            NewRoom createRoom = new NewRoom();
-
-            if (createRoom.ShowDialog() == true)
-            {
-
-            }
+            GameClass.MyPlayerName = TbPlayerName.Text ?? "Player";
+            
+            GameRoom.NewRoom();
         }
 
         private void BtJoinToServer_Click(object sender, RoutedEventArgs e)
         {
-            JoinRoom joinToRoom = new JoinRoom();
-            joinToRoom.ShowDialog();
+            GameClass.MyPlayerName = TbPlayerName.Text ?? "Player";
+            
+            GameRoom.JoinToRoom();
         }
+
+        
     }
 }
