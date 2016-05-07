@@ -11,6 +11,10 @@ namespace Client
     /// </summary>
     public partial class PlayersTableManager : UserControl
     {
+        private static Image[] _imgPlayerCardArray = new Image[10];
+        private static Label[] _labPlayerName = new Label[10];
+        private static Random rng = new Random();
+        public enum NameOfBackground { Palm, Wood, Bokeh }
         public PlayersTableManager()
         {
             InitializeComponent();
@@ -27,11 +31,6 @@ namespace Client
             //CreateLabel(numbersOfPlayers,"Player");
             //CreatePlayer(numbersOfPlayers);
         }
-
-        private static Image[] _imgPlayerCardArray = new Image[10];
-        private static Label[] _labPlayerName = new Label[10];
-        public enum NameOfBackground {Palm, Wood, Bokeh}
-        private static Random rng = new Random();
 
         public static void ChangePlayerCard(byte nrPlayer, byte cardNr)
         {
@@ -96,7 +95,7 @@ namespace Client
             }
         }
 
-        private void CreatePlayer(byte playersNumber)
+        private  void CreatePlayer(byte playersNumber)
         {
             var distance = (2 * Math.PI) / playersNumber;
             var radius = 0.75 * (GridPlayer.Height - 10);
@@ -119,7 +118,7 @@ namespace Client
                 GridPlayer.Children.Add(card);
             }
         }
-        private void CreatePlayersAndLabel(byte playersNumber, string name)
+        private  void CreatePlayersAndLabel(byte playersNumber, string name)
         {
             var distance = (2 * Math.PI) / playersNumber;
             var radius = 0.75 * (GridPlayer.Height - 10);

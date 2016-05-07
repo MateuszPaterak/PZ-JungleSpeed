@@ -20,8 +20,6 @@ namespace SerwerTest
         private int _port;
         private TcpListener _server;
         private TcpClient _client;
-        //private BinaryWriter WriteToClient;
-        //private BinaryReader ReadFromClient;
         private delegate void DelegForTextCallBack(string tekst);
         private byte[] _byteData = new byte[100];
 
@@ -123,19 +121,15 @@ namespace SerwerTest
                 TcpListener serv = (TcpListener) asyncResult.AsyncState; //lokalny obiekt serwera komunikujący się z klientem 
                 _client = serv.EndAcceptTcpClient(asyncResult); //kończy operację połączenia z klientem
                 WriteToTbDisplayNewline("Połączenie z klientem powiodło się."); //wyświetl napis z odpowiedniego wątku 
-
-                //WriteToClient = new BinaryWriter(client.GetStream());
-                //ReadFromClient = new BinaryReader(client.GetStream());
-                //WriteToClient.Write("GetThisData");
             }
             catch (Exception ex)
             {
                 //WriteToTbDisplayNewline(ex.ToString());
             }
 
-
             //run reveive data mode
-            if (_client == null || !_client.Connected) return;
+            if (_client == null) return;
+            if (!_client.Connected) return;
             try
             {
                 _client.Client.BeginReceive(_byteData,
@@ -151,21 +145,26 @@ namespace SerwerTest
             }
         }
 
+        //wykonywanie rekurencyjne odbioru danych
         private void ReceiveDataFromClient(IAsyncResult arg)
         {
-            if (!_client.Connected || _client == null) return;
+            if (_client == null) return;
+            if (!_client.Connected) return;
             try
             {
                 _client.Client.EndReceive(arg);
-
-
-                byte[] arraytmp = new byte[15];
-                Array.Copy(_byteData, arraytmp, 15);
+                
+                var datalength = _byteData[0];
+                byte[] arraytmp = new byte[datalength];
+                Array.Copy(_byteData, arraytmp, datalength);
                 WriteToTbDisplayNewline("Odebrano od klienta: " + Encoding.UTF8.GetString(arraytmp));
+                WriteToTbDisplayNewline("Długość całkowita: " + Convert.ToString(arraytmp[0]));
+                WriteToTbDisplayNewline("Kod komunikatu: " + Convert.ToString(arraytmp[1]));
 
-                _byteData = new byte[100];
+                _byteData = new byte[1000];
 
-                _client.Client.BeginReceive(_byteData, //wait for new next messages
+                _client.Client.BeginReceive(
+                    _byteData, //wait for new next messages
                     0,
                     _byteData.Length,
                     SocketFlags.None,

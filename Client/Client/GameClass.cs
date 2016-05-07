@@ -13,7 +13,7 @@ namespace Client
         public static string MyPlayerName { get; set; }
         private static List<int> IdListPlayer = new List<int>();
         private static Dictionary<int, string> NameOfPlayer = new Dictionary<int, string>();
-        private static Dictionary<int, int> AmountOPlayerCards = new Dictionary<int, int>();
+        private static Dictionary<int, int> AmountOfPlayerCards = new Dictionary<int, int>();
         
         //on start: create table with player
         //create label with name of players
@@ -21,7 +21,7 @@ namespace Client
         {
             IdListPlayer = new List<int>();
             NameOfPlayer = new Dictionary<int, string>();
-            AmountOPlayerCards = new Dictionary<int, int>();
+            AmountOfPlayerCards = new Dictionary<int, int>();
         }
         public static void ClearIdListPlayer()
         {
@@ -33,7 +33,7 @@ namespace Client
         }
         public static void ClearAmountOPlayerCards()
         {
-            AmountOPlayerCards = new Dictionary<int, int>();
+            AmountOfPlayerCards = new Dictionary<int, int>();
         }
 
         public static void AddPlayersName(int id, string name)
@@ -54,13 +54,13 @@ namespace Client
         }
         public static void AddPlayerAmountCard(int idPlayer, int idCard)
         {
-            if (AmountOPlayerCards.ContainsKey(idPlayer))
+            if (AmountOfPlayerCards.ContainsKey(idPlayer))
             {
-                AmountOPlayerCards[idPlayer] = idCard;
+                AmountOfPlayerCards[idPlayer] = idCard;
             }
             else
             {
-                AmountOPlayerCards.Add(idPlayer, idCard);
+                AmountOfPlayerCards.Add(idPlayer, idCard);
             }
             
             if (!IdListPlayer.Contains(idPlayer))
@@ -82,6 +82,7 @@ namespace Client
         
         public static void ClearGameRoom()
         {
+            NameRoom = String.Empty;
             IdListRoom = new List<int>();
             IdListPlayerInRoom = new List<int>();
             IdListPlayerToStartGame = new List<int>();
@@ -104,7 +105,6 @@ namespace Client
                 NameOfRoom.Add(id, name);
             }
         }
-
         public static void AddPlayerNameInRoom(int idPlayer, string playerName)
         {
             if (NameOfPlayers.ContainsKey(idPlayer))
@@ -120,7 +120,6 @@ namespace Client
                 IdListPlayerInRoom.Add(idPlayer);
             }
         }
-
         public static void AddPlayerToStartGame(int idPlayer, string playerName)
         {
             if (NameOfPlayers.ContainsKey(idPlayer))
@@ -162,8 +161,12 @@ namespace Client
         {//TODO
             ClearGameRoom();
 
+            Network.ConnectToServer();
+            Network.BeginReceiveDataFromServer();
+
             NewRoom createRoom = new NewRoom();
             if (createRoom.ShowDialog() != true) return;
+            //todo check correct set data from server
             ((MainWindow)Application.Current.MainWindow).CUserControl.Content = MyContentClassWindow.ChangeContent(ContNum.PlayersBoard);
             Network.SendCommand(GameSendCommand.StartGame);
         }
@@ -175,18 +178,25 @@ namespace Client
             Network.ConnectToServer();
             Network.BeginReceiveDataFromServer();
             
-            ((MainWindow)Application.Current.MainWindow).joinToRoom.ShowDialog();
+            JoinWindowObj.WindowJoinRoom = new JoinRoom();
+            JoinWindowObj.WindowJoinRoom.ShowDialog();
         }
 
         public static void StartGameFromJoinRoom(byte playerAmount)
-        {
-            ((MainWindow) Application.Current.MainWindow).CloseJoinRoomWindow();
+        {//todo
+            JoinWindowObj.WindowJoinRoom.Close();
 
             ((MainWindow)Application.Current.MainWindow).CUserControl.Content 
                 = MyContentClassWindow.ChangeContent(ContNum.PlayersBoard);
 
             ((MainWindow) Application.Current.MainWindow).CUserControl.Content
                 = new PlayersTableManager(playerAmount);
+            
         }
+    }
+
+    public static class JoinWindowObj
+    {
+        public static JoinRoom WindowJoinRoom = new JoinRoom();
     }
 }

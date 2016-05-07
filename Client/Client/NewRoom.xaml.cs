@@ -16,12 +16,20 @@ namespace Client
 
         private void BtCreateRoom_Click(object sender, RoutedEventArgs e)
         {
-
+            if (TBNameRoom.Text == null)
+            {
+                MessageBox.Show("Nazwa pokoju nie może być pusta.");
+            }
+            else
+            {
+                GameRoom.NameRoom = TBNameRoom.Text;
+            }
         }
 
         private void BtRemoveRoom_Click(object sender, RoutedEventArgs e)
         {
-
+            Network.SendCommand(GameSendCommand.CloseMyRoom);
+            //GameRoom.
         }
 
         private void BtRemovePlayer_Click(object sender, RoutedEventArgs e)

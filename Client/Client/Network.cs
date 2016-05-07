@@ -1,48 +1,78 @@
 ﻿using System;
-using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using System.Windows;
 
 namespace Client
 {
-    public class Network
+    public static class Network
     {
         public static TcpClient MyClient;
         private static byte[] _byteDataSend = new byte[100];
-        private static byte[] _byteDataReceve = new byte[100];
+        private static byte[] _byteDataReceive = new byte[1000];
         private static int port = 1000;
         private static string host = "127.0.0.1";
         
-        public static void ConnectToServer()
+        public static bool ConnectToServer()
         {
-            try
+            var portOffset = 0;
+            if (MyClient==null)
             {
-                MyClient = new TcpClient(host, port);
-                MessageBox.Show("Nawiązano połączenie z " + host + " na porcie " + port);
+                do
+                {
+                    try
+                    {
+                        MyClient = new TcpClient(host, port+ portOffset);
+                        MessageBox.Show("Nawiązano połączenie z " + host + " na porcie " + port);
+                        return true;
+                    }
+                    catch (Exception)
+                    {
+                            // ignored
+                    }
+                    portOffset++;
+                } while (portOffset<11);
             }
-            catch (Exception)
+            if (MyClient == null) return false;
+            if (MyClient.Connected) return true;
+            
+            //not connected
+            portOffset = 0;
+            do
             {
-                MessageBox.Show("Nie udało się nawiązać połączenia z serwerem");
-            }
+                try
+                {
+                    MyClient = new TcpClient(host, port + portOffset);
+                    MessageBox.Show("Nawiązano połączenie z serwerem " + host + " na porcie " + port);
+                    return true;
+                }
+                catch (Exception)
+                {
+                    // ignored
+                }
+                portOffset++;
+            } while (portOffset < 11);
+            MessageBox.Show("Nie udało się nawiązać połączenia z serwerem");
+            return false;
         }
 
         public static void BeginReceiveDataFromServer()
         {
             try
             {
-                if (MyClient != null && MyClient.Connected)
+                //if (MyClient != null && MyClient.Connected)
+                if (MyClient == null || !MyClient.Connected) return;
                 {
                     MyClient.Client.BeginReceive(
-                        _byteDataReceve,
+                        _byteDataReceive,
                         0,
-                        _byteDataReceve.Length,
+                        _byteDataReceive.Length,
                         SocketFlags.None,
                         OnReceiveLoop,
                         MyClient);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //MessageBox.Show(ex.ToString());
             }
@@ -50,23 +80,25 @@ namespace Client
 
         private static void OnReceiveLoop(IAsyncResult arg)
         {
-            if (MyClient == null || !MyClient.Connected) return;
+            if (MyClient == null) return;
+            if (!MyClient.Connected) return;
+
             try
             {
                 MyClient.Client.EndReceive(arg);
-                ReceiveComand();
+                ReceiveCommand();
                 // MessageBox.Show("Odebrano od serwera: " + Encoding.UTF8.GetString(_byteData));
-                _byteDataReceve = null;                                             //->>>>problem with null
+                _byteDataReceive = new byte[1000];        
 
                 MyClient.Client.BeginReceive(
-                    _byteDataReceve, //wait for new next messages
+                    _byteDataReceive, //wait for new next messages
                     0,
-                    _byteDataReceve.Length,
+                    _byteDataReceive.Length,
                     SocketFlags.None,
                     OnReceiveLoop,
                     null);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //MessageBox.Show("Błąd odbioru danych. "+ex);
             }
@@ -90,21 +122,21 @@ namespace Client
             }
         }
 
-        private static void ReceiveComand()
+        private static void ReceiveCommand()
         {
-            if(_byteDataReceve==null)   return;
+            if(_byteDataReceive==null)   return;
 
-            switch (_byteDataReceve[1])
+            switch (_byteDataReceive[1])
             {
                 case 1:
-                    {//receive amount of card all players
+                    {//receive amount of card all players and start game
                         GameClass.ClearIdListPlayer();
                         GameClass.ClearAmountOPlayerCards();
-                        var amountOfPlayers = _byteDataReceve[2];
+                        var amountOfPlayers = _byteDataReceive[2];
                         for (var i = 0; i < amountOfPlayers; i++)
                             {
-                                var idPlayer = _byteDataReceve[3 + i*2];
-                                var amountOfCards = _byteDataReceve[4 + i*2];
+                                var idPlayer = _byteDataReceive[3 + i*2];
+                                var amountOfCards = _byteDataReceive[4 + i*2];
                                 GameClass.AddPlayerAmountCard(idPlayer,amountOfCards);
                             }
                         GameRoom.StartGameFromJoinRoom(amountOfPlayers);
@@ -114,16 +146,16 @@ namespace Client
                     {//receive list of player name in game
                         GameClass.ClearNameOfPlayer();
                         GameClass.ClearIdListPlayer();
-                        var amountOfPlayers = _byteDataReceve[2];
+                        var amountOfPlayers = _byteDataReceive[2];
                         var pointerToRead = 3;
 
                         for (var i = 0; i < amountOfPlayers; i++)
                         {
 
-                            int idPlayer = _byteDataReceve[pointerToRead];
-                            int lengthOfLogin = _byteDataReceve[pointerToRead+1];
+                            int idPlayer = _byteDataReceive[pointerToRead];
+                            int lengthOfLogin = _byteDataReceive[pointerToRead+1];
                             var login = new byte[lengthOfLogin];
-                            Array.Copy(_byteDataReceve, pointerToRead+2, login, 0, lengthOfLogin);
+                            Array.Copy(_byteDataReceive, pointerToRead+2, login, 0, lengthOfLogin);
                             GameClass.AddPlayersName(idPlayer, Encoding.UTF8.GetString(login));
                             pointerToRead += (2 + lengthOfLogin);
                         }
@@ -141,8 +173,8 @@ namespace Client
                     }
                 case 5:
                     {//display card at the player
-                        var idPlayer = _byteDataReceve[2];
-                        var idCard = _byteDataReceve[3];
+                        var idPlayer = _byteDataReceive[2];
+                        var idCard = _byteDataReceive[3];
                         PlayersTableManager.ChangePlayerCard(idPlayer,idCard);
                         PlayersTableManager.ChangeCardRandomRotation(idPlayer);
                         break;
@@ -161,15 +193,15 @@ namespace Client
                     {//list of room and ID
                         GameRoom.ClearIdListRoom();
                         GameRoom.ClearNameOfRoom();
-                        var amountOfRooms = _byteDataReceve[2];
+                        var amountOfRooms = _byteDataReceive[2];
                         var pointerToRead = 3;
 
                         for (var i = 0; i < amountOfRooms; i++)
                         {
-                            int idRoom = _byteDataReceve[pointerToRead];
-                            int lengthOfName = _byteDataReceve[pointerToRead + 1];
+                            int idRoom = _byteDataReceive[pointerToRead];
+                            int lengthOfName = _byteDataReceive[pointerToRead + 1];
                             var name = new byte[lengthOfName];
-                            Array.Copy(_byteDataReceve, pointerToRead + 2, name, 0, lengthOfName);
+                            Array.Copy(_byteDataReceive, pointerToRead + 2, name, 0, lengthOfName);
                             GameRoom.AddRoomAndId(idRoom,Encoding.UTF8.GetString(name));
                             pointerToRead += (2 + lengthOfName);
                         }
@@ -179,15 +211,15 @@ namespace Client
                     {//list of player name +ID in room
                         GameRoom.ClearNameOfPlayers();
                         GameRoom.ClearIdListPlayerInRoom();
-                        var amountOfPlayers = _byteDataReceve[2];
+                        var amountOfPlayers = _byteDataReceive[2];
                         var pointerToRead = 3;
 
                         for (var i = 0; i < amountOfPlayers; i++)
                         {
-                            int idPlayer = _byteDataReceve[pointerToRead];
-                            int lengthOfLogin = _byteDataReceve[pointerToRead + 1];
+                            int idPlayer = _byteDataReceive[pointerToRead];
+                            int lengthOfLogin = _byteDataReceive[pointerToRead + 1];
                             var login = new byte[lengthOfLogin];
-                            Array.Copy(_byteDataReceve, pointerToRead + 2, login, 0, lengthOfLogin);
+                            Array.Copy(_byteDataReceive, pointerToRead + 2, login, 0, lengthOfLogin);
                             GameRoom.AddPlayerNameInRoom(idPlayer, Encoding.UTF8.GetString(login));
                             pointerToRead += (2 + lengthOfLogin);
                         }
@@ -197,21 +229,21 @@ namespace Client
                     {//list of players+ID to start game in room
                         GameRoom.ClearIdListPlayerToStartGame();
                         GameRoom.ClearNameOfPlayers();
-                        var amountOfPlayers = _byteDataReceve[2];
+                        var amountOfPlayers = _byteDataReceive[2];
                         var pointerToRead = 3;
 
                         for (var i = 0; i < amountOfPlayers; i++)
                         {
-                            int idPlayer = _byteDataReceve[pointerToRead];
-                            int lengthOfLogin = _byteDataReceve[pointerToRead + 1];
+                            int idPlayer = _byteDataReceive[pointerToRead];
+                            int lengthOfLogin = _byteDataReceive[pointerToRead + 1];
                             var login = new byte[lengthOfLogin];
-                            Array.Copy(_byteDataReceve, pointerToRead + 2, login, 0, lengthOfLogin);
+                            Array.Copy(_byteDataReceive, pointerToRead + 2, login, 0, lengthOfLogin);
                             GameRoom.AddPlayerToStartGame(idPlayer, Encoding.UTF8.GetString(login));
                             pointerToRead += (2 + lengthOfLogin);
                         }
                         break;
                     }
-                case 11://todo
+                case 11://todo display winner nick
                     {//end of game
                         GameClass.ClearGameClass();
                         ((MainWindow)Application.Current.MainWindow).CUserControl.Content = new UCMainScreen();
@@ -220,6 +252,7 @@ namespace Client
 
             }
         }
+
         public static void SendCommand(GameSendCommand command, byte[] arg=null)
         {
             switch (command)
@@ -420,19 +453,20 @@ namespace Client
                 EndSend,
                 null);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //MessageBox.Show("Błąd podczas wysyłania: " + ex);
             }
 }
+
         private static void EndSend(IAsyncResult arg)
         {
             try
             {
                 MyClient.Client.EndSend(arg);
-                _byteDataSend = null;
+                _byteDataSend = new byte[1000];
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //MessageBox.Show("Błąd żakończenia wysłania danych. " + ex);
             }

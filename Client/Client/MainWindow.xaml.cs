@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net.Sockets;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace Client
 {
@@ -18,21 +19,35 @@ namespace Client
             //CUserControl.Content = MyContentClassWindow.ChangeContent(ContNum.StartImg);
             //CUserControl.Content = MyContentClassWindow.ChangeContent(ContNum.PlayersBoard);
         }
-        public JoinRoom joinToRoom = new JoinRoom();
-
-        public void CloseJoinRoomWindow()
-        {
-            joinToRoom.Close();
-        }
-
 
         private void NewRoom(object sender, RoutedEventArgs e) //menu
         {
+            try
+            {
+                UCMainScreen uc = (UCMainScreen) CUserControl.Content;
+                GameClass.MyPlayerName = uc.TbPlayerName.Text ?? "Player";
+            }
+            catch (Exception)
+            {
+                GameClass.MyPlayerName = "Player";
+            }
+            
             GameRoom.NewRoom();
+            
         }
 
         private void JoinToRoom(object sender, RoutedEventArgs e) //menu
         {
+            try
+            {
+                UCMainScreen uc = (UCMainScreen)CUserControl.Content;
+                GameClass.MyPlayerName = uc.TbPlayerName.Text ?? "Player";
+            }
+            catch (Exception)
+            {
+                GameClass.MyPlayerName = "Player";
+            }
+
             GameRoom.JoinToRoom();
         }
 

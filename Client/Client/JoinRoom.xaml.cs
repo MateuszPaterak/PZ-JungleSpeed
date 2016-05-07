@@ -26,7 +26,7 @@ namespace Client
         {//todo
             //start game
             //DialogResult = true;
-            this.Close();
+            //this.Close();
         }
 
         private void btExitFromGame_Click(object sender, RoutedEventArgs e)
