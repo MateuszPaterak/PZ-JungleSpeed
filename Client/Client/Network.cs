@@ -11,7 +11,7 @@ namespace Client
         private static byte[] _byteDataSend = new byte[100];
         private static byte[] _byteDataReceive = new byte[1000];
         private static int port = 1000;
-        private static string host = "127.0.0.1";
+        public static string Host = "127.0.0.1";
         
         public static bool ConnectToServer()
         {
@@ -22,8 +22,8 @@ namespace Client
                 {
                     try
                     {
-                        MyClient = new TcpClient(host, port+ portOffset);
-                        MessageBox.Show("Nawiązano połączenie z " + host + " na porcie " + port);
+                        MyClient = new TcpClient(Host, port+ portOffset);
+                        MessageBox.Show("Nawiązano połączenie z " + Host + " na porcie " + port);
                         return true;
                     }
                     catch (Exception)
@@ -42,8 +42,8 @@ namespace Client
             {
                 try
                 {
-                    MyClient = new TcpClient(host, port + portOffset);
-                    MessageBox.Show("Nawiązano połączenie z serwerem " + host + " na porcie " + port);
+                    MyClient = new TcpClient(Host, port + portOffset);
+                    MessageBox.Show("Nawiązano połączenie z serwerem " + Host + " na porcie " + port);
                     return true;
                 }
                 catch (Exception)
@@ -130,7 +130,7 @@ namespace Client
             {
                 case 1:
                     {//receive amount of card all players and start game
-                        GameClass.ClearIdListPlayer();
+                        //GameClass.ClearIdListPlayer();
                         GameClass.ClearAmountOPlayerCards();
                         var amountOfPlayers = _byteDataReceive[2];
                         for (var i = 0; i < amountOfPlayers; i++)
@@ -139,7 +139,7 @@ namespace Client
                                 var amountOfCards = _byteDataReceive[4 + i*2];
                                 GameClass.AddPlayerAmountCard(idPlayer,amountOfCards);
                             }
-                        GameRoom.StartGameFromJoinRoom(amountOfPlayers);
+                        GameRoom.InitGame(amountOfPlayers);
                         break;
                     }
                 case 2:
@@ -152,7 +152,7 @@ namespace Client
                         for (var i = 0; i < amountOfPlayers; i++)
                         {
 
-                            int idPlayer = _byteDataReceive[pointerToRead];
+                            byte idPlayer = _byteDataReceive[pointerToRead];
                             int lengthOfLogin = _byteDataReceive[pointerToRead+1];
                             var login = new byte[lengthOfLogin];
                             Array.Copy(_byteDataReceive, pointerToRead+2, login, 0, lengthOfLogin);
@@ -175,8 +175,7 @@ namespace Client
                     {//display card at the player
                         var idPlayer = _byteDataReceive[2];
                         var idCard = _byteDataReceive[3];
-                        PlayersTableManager.ChangePlayerCard(idPlayer,idCard);
-                        PlayersTableManager.ChangeCardRandomRotation(idPlayer);
+                        GameClass.ChangeCardAtThePlayer(idPlayer,idCard);
                         break;
                     }
                 case 6:
@@ -245,6 +244,7 @@ namespace Client
                     }
                 case 11://todo display winner nick
                     {//end of game
+                        //destruct/reset game object
                         GameClass.ClearGameClass();
                         ((MainWindow)Application.Current.MainWindow).CUserControl.Content = new UCMainScreen();
                         break;

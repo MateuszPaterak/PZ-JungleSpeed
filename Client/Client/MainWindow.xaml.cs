@@ -97,5 +97,11 @@ namespace Client
             }
             */
         }
+
+        private void ConfigIpServer(object sender, RoutedEventArgs e)
+        {
+            ((MainWindow)Application.Current.MainWindow).CUserControl.Content =
+                new UCConfigServer();
+        }
     }
 }

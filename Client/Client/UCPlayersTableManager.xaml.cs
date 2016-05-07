@@ -15,67 +15,63 @@ namespace Client
         private static Label[] _labPlayerName = new Label[10];
         private static Random rng = new Random();
         public enum NameOfBackground { Palm, Wood, Bokeh }
-        public PlayersTableManager()
-        {
-            InitializeComponent();
-
-            CreatePlayersAndLabel(2, "Player");
-        }
 
         public PlayersTableManager(byte numbersOfPlayers)
         {
             InitializeComponent();
 
+            _imgPlayerCardArray = new Image[10]; //clear
+            _labPlayerName = new Label[10];
+
             CreatePlayersAndLabel(numbersOfPlayers, "Player");
             ChangeBackground("palm");
-            //CreateLabel(numbersOfPlayers,"Player");
-            //CreatePlayer(numbersOfPlayers);
         }
 
-        public static void ChangePlayerCard(byte nrPlayer, byte cardNr)
+        public static void ChangePlayerCard(byte nrPlayerOnTable, byte cardNr)
         {
             try
             {
-                _imgPlayerCardArray[nrPlayer].Source =
+                _imgPlayerCardArray[nrPlayerOnTable].Source =
                  new BitmapImage(
                          new Uri(@"/Pictures/Cards/" + cardNr.ToString() + ".png", UriKind.Relative));
             }
-            catch (NullReferenceException)
+            catch (Exception)
             {
+                MessageBox.Show("Karta do wyświetlenia nie została znaleziona w katalogu gry");
             }
          
         }
 
-        public static void ChangeCardRotation(byte nrPlayer, int angle)
+        public static void ChangeCardRotation(byte nrPlayerOnTable, int angle)
         {
-            RotateTransform rot = new RotateTransform(angle, _imgPlayerCardArray[nrPlayer].Width/2, _imgPlayerCardArray[nrPlayer].Height/2);
-            _imgPlayerCardArray[nrPlayer].RenderTransform = rot;
-
+            RotateTransform rot = new RotateTransform(angle, _imgPlayerCardArray[nrPlayerOnTable].Width/2, _imgPlayerCardArray[nrPlayerOnTable].Height/2);
+            _imgPlayerCardArray[nrPlayerOnTable].RenderTransform = rot;
         }
 
-        public static void ChangeCardRandomRotation(byte nrPlayer)
+        public static void ChangeCardRandomRotation(byte nrPlayerOnTable)
         {
             try
             {
                 int angle = rng.Next(0, 360);
 
-                RotateTransform rot = new RotateTransform(angle, _imgPlayerCardArray[nrPlayer].Width/2,
-                    _imgPlayerCardArray[nrPlayer].Height/2);
+                RotateTransform rot = new RotateTransform(angle, _imgPlayerCardArray[nrPlayerOnTable].Width/2,
+                    _imgPlayerCardArray[nrPlayerOnTable].Height/2);
 
-                _imgPlayerCardArray[nrPlayer].RenderTransform = rot;
+                _imgPlayerCardArray[nrPlayerOnTable].RenderTransform = rot;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 
             }
 
         }
-        private void CreateLabel(byte playersNumber, string name)
+
+        private void CreateLabel(byte playersNumberOnTable, string name)
         {
-            var distance = (2 * Math.PI) / playersNumber;
+            var distance = (2 * Math.PI) / playersNumberOnTable;
             var radius = 0.75 * (GridPlayer.Height - 10);
 
-            for (byte num = 0; num < playersNumber; num++)
+            for (byte num = 0; num < playersNumberOnTable; num++)
             {
                 var pos = distance * num;
                 var posY = -Math.Sin(pos + 1.5 * Math.PI) * radius;
@@ -95,12 +91,12 @@ namespace Client
             }
         }
 
-        private  void CreatePlayer(byte playersNumber)
+        private  void CreatePlayer(byte playersAmount)
         {
-            var distance = (2 * Math.PI) / playersNumber;
+            var distance = (2 * Math.PI) / playersAmount;
             var radius = 0.75 * (GridPlayer.Height - 10);
 
-            for (byte num = 0; num < playersNumber; num++)
+            for (byte num = 0; num < playersAmount; num++)
             {
                 var pos = distance * num;
                 var posY = -Math.Sin(pos + 1.5 * Math.PI) * radius;
@@ -118,12 +114,13 @@ namespace Client
                 GridPlayer.Children.Add(card);
             }
         }
-        private  void CreatePlayersAndLabel(byte playersNumber, string name)
+
+        private  void CreatePlayersAndLabel(byte playersAmount, string name)
         {
-            var distance = (2 * Math.PI) / playersNumber;
+            var distance = (2 * Math.PI) / playersAmount;
             var radius = 0.75 * (GridPlayer.Height - 10);
 
-            for (byte num = 0; num < playersNumber; num++)
+            for (byte num = 0; num < playersAmount; num++)
             {
                 var pos = distance * num;
                 var posY = -Math.Sin(pos + 1.5 * Math.PI) * radius;
@@ -143,7 +140,7 @@ namespace Client
             }
         
 
-            for (byte num=0; num<playersNumber; num++)
+            for (byte num=0; num<playersAmount; num++)
             {
                 var pos = distance*num;
                 var posY = -Math.Sin(pos + 1.5*Math.PI) * radius;
@@ -162,15 +159,15 @@ namespace Client
             }
         }
 
-        public static void ChangeNamePlayer(string name, byte numer)
+        public static void ChangeNamePlayer(byte nrPlayerOnTable, string name)
         {
             try
             {
-                _labPlayerName[numer].Content = name;
+                _labPlayerName[nrPlayerOnTable].Content = name;
             }
-            catch (NullReferenceException e)
+            catch (Exception)
             {
-                _labPlayerName[numer].Content = "Player";
+                _labPlayerName[nrPlayerOnTable].Content = "Player";
             }
         }
 
