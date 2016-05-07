@@ -35,12 +35,15 @@ namespace MiniClient
         private void button5_Click(object sender, EventArgs e)
         {
             button5.Enabled = false;
-            host = "188.33.22.163"; //textBox1.Text;
+            host = "127.0.0.1"; //textBox1.Text;
             port = 1000; //System.Convert.ToInt16(numericUpDown1.Value);
             try
             {
                 klient = new TcpClient(host, port);
-                dziennik.Items.Add("Nawiązano połączenie z " + host + " na porcie: " + port);
+                dziennik.Invoke(new Action(delegate()
+                {
+                    dziennik.Items.Add("Nawiązano połączenie z " + host + " na porcie: " + port);
+                }));
                 klient.Client.BeginReceive(byteData,
                                        0,
                                        byteData.Length,
@@ -59,17 +62,20 @@ namespace MiniClient
         private void button6_Click(object sender, EventArgs e)
         {
             button6.Enabled = false;
-            host = "188.33.22.163"; //textBox1.Text;
+            host = "127.0.0.1"; //textBox1.Text;
             port = 1000; //System.Convert.ToInt16(numericUpDown1.Value);
             try
             {
                 klient2 = new TcpClient(host, port);
-                dziennik.Items.Add("Nawiązano połączenie z " + host + " na porcie: " + port);
-                klient.Client.BeginReceive(byteData,
+                dziennik.Invoke(new Action(delegate()
+                {
+                    dziennik.Items.Add("Nawiązano połączenie z " + host + " na porcie: " + port);
+                }));
+                klient2.Client.BeginReceive(byteData,
                                        0,
                                        byteData.Length,
                                        SocketFlags.None,
-                                       new AsyncCallback(OnReceive),
+                                       new AsyncCallback(OnReceive2),
                                        null);
                 ReadFromServer = new BinaryReader(klient2.GetStream());
             }
@@ -86,7 +92,10 @@ namespace MiniClient
             {
                 klient.Client.EndReceive(ar);
                 odpowiedzSerwera = Encoding.ASCII.GetString(byteData);
-                dziennik.Items.Add(odpowiedzSerwera);
+                dziennik.Invoke(new Action(delegate()
+                {
+                    dziennik.Items.Add(odpowiedzSerwera);
+                }));
                 //Accordingly process the message received
 
                 /*
@@ -145,7 +154,10 @@ namespace MiniClient
             {
                 klient2.Client.EndReceive(ar);
                 odpowiedzSerwera = Encoding.ASCII.GetString(byteData);
-                dziennik.Items.Add(odpowiedzSerwera);
+                dziennik.Invoke(new Action(delegate()
+                {
+                    dziennik.Items.Add(odpowiedzSerwera);
+                }));
                 //Accordingly process the message received
                 
                 /*
@@ -204,8 +216,11 @@ namespace MiniClient
                 //Fill the info for the message to be send
                 wiadomoscKlienta = "FLIPCARD";
 
-                byte[] byteData = new byte[8];
-                byteData = Encoding.ASCII.GetBytes(wiadomoscKlienta);
+                int temp1 = 0;
+                int temp2 = 65;
+                byte[] byteData = new byte[2];
+                byteData[0] = Convert.ToByte(temp1);
+                byteData[1] = Convert.ToByte(temp2);
 
                 //Send it to the server
                 klient.Client.BeginSend(byteData, 0, byteData.Length, SocketFlags.None, new AsyncCallback(OnSend), null);
@@ -250,7 +265,7 @@ namespace MiniClient
                 byteData = Encoding.ASCII.GetBytes(wiadomoscKlienta);
 
                 //Send it to the server
-                klient2.Client.BeginSend(byteData, 0, byteData.Length, SocketFlags.None, new AsyncCallback(OnSend), null);
+                klient2.Client.BeginSend(byteData, 0, byteData.Length, SocketFlags.None, new AsyncCallback(OnSend2), null);
 
                 wiadomoscKlienta = "";
             }
@@ -270,7 +285,7 @@ namespace MiniClient
                 byte[] byteData = Encoding.ASCII.GetBytes(wiadomoscKlienta);
 
                 //Send it to the server
-                klient2.Client.BeginSend(byteData, 0, byteData.Length, SocketFlags.None, new AsyncCallback(OnSend), null);
+                klient2.Client.BeginSend(byteData, 0, byteData.Length, SocketFlags.None, new AsyncCallback(OnSend2), null);
 
                 wiadomoscKlienta = "";
             }
