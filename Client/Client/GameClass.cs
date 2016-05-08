@@ -1,93 +1,89 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Forms.VisualStyles;
 
 namespace Client
 {
     public static class GameClass
     {
         public static string MyPlayerName { get; set; }
-        private static List<int> IdListPlayer = new List<int>();
-        private static Dictionary<byte, string> NameOfPlayer = new Dictionary<byte, string>();
-        private static Dictionary<int, int> AmountOfPlayerCards = new Dictionary<int, int>();
-        private static Dictionary<byte, byte> IdPlayerToIdPlaceOnTable = new Dictionary<byte,byte>();
-
-        //on start: create table with player
-        //create label with name of players
+        private static List<int> _idListPlayer = new List<int>();
+        private static Dictionary<byte, string> _nameOfPlayer = new Dictionary<byte, string>();
+        private static Dictionary<int, int> _amountOfPlayerCards = new Dictionary<int, int>();
+        private static Dictionary<byte, byte> _idPlayerToIdPlaceOnTable = new Dictionary<byte,byte>();
+        //todo add MyIdPlayer
+        
         public static void ClearGameClass()
         {
-            IdListPlayer = new List<int>();
-            NameOfPlayer = new Dictionary<byte, string>();
-            AmountOfPlayerCards = new Dictionary<int, int>();
-            IdPlayerToIdPlaceOnTable = new Dictionary<byte, byte>();
+            _idListPlayer = new List<int>();
+            _nameOfPlayer = new Dictionary<byte, string>();
+            _amountOfPlayerCards = new Dictionary<int, int>();
+            _idPlayerToIdPlaceOnTable = new Dictionary<byte, byte>();
         }
         public static void ClearIdListPlayer()
         {
-            IdListPlayer = new List<int>();
+            _idListPlayer = new List<int>();
         }
         public static void ClearNameOfPlayer()
         {
-            NameOfPlayer = new Dictionary<byte, string>();
+            _nameOfPlayer = new Dictionary<byte, string>();
         }
         public static void ClearAmountOPlayerCards()
         {
-            AmountOfPlayerCards = new Dictionary<int, int>();
+            _amountOfPlayerCards = new Dictionary<int, int>();
         }
 
         public static void AddPlayersName(byte idPlayer, string name)
         {
-            if (NameOfPlayer.ContainsKey(idPlayer))
+            if (_nameOfPlayer.ContainsKey(idPlayer))
             {
-                NameOfPlayer[idPlayer] = name;
+                _nameOfPlayer[idPlayer] = name;
             }
             else
             {
-                NameOfPlayer.Add(idPlayer, name);
+                _nameOfPlayer.Add(idPlayer, name);
             }
             
-            if (!IdListPlayer.Contains(idPlayer))
+            if (!_idListPlayer.Contains(idPlayer))
             {
-                IdListPlayer.Add(idPlayer);
+                _idListPlayer.Add(idPlayer);
             }
         }
         public static void AddPlayerAmountCard(int idPlayer, int idCard)
         {
-            if (AmountOfPlayerCards.ContainsKey(idPlayer))
+            if (_amountOfPlayerCards.ContainsKey(idPlayer))
             {
-                AmountOfPlayerCards[idPlayer] = idCard;
+                _amountOfPlayerCards[idPlayer] = idCard;
             }
             else
             {
-                AmountOfPlayerCards.Add(idPlayer, idCard);
+                _amountOfPlayerCards.Add(idPlayer, idCard);
             }
             
-            if (!IdListPlayer.Contains(idPlayer))
+            if (!_idListPlayer.Contains(idPlayer))
             {
-                IdListPlayer.Add(idPlayer);
+                _idListPlayer.Add(idPlayer);
             }
         }
 
         public static void ChangeCardAtThePlayer(byte idPlayer, byte idCard)
         {
-            var idPlaceOnTable = IdPlayerToIdPlaceOnTable[idPlayer];
+            var idPlaceOnTable = _idPlayerToIdPlaceOnTable[idPlayer];
             PlayersTableManager.ChangePlayerCard(idPlaceOnTable, idCard);
             PlayersTableManager.ChangeCardRandomRotation(idPlaceOnTable);
         }
         public static void SetNewPlayerName(byte idPlayer, string name)
         {
-            byte idOnTable = IdPlayerToIdPlaceOnTable[idPlayer];
+            byte idOnTable = _idPlayerToIdPlaceOnTable[idPlayer];
             PlayersTableManager.ChangeNamePlayer(idOnTable, name);
         }
         public static void SetAllNewPlayerName()
         {
-            foreach (byte idPlayer in IdListPlayer)
+            foreach (int idPlayer in _idListPlayer)
             {
-                string name = NameOfPlayer[idPlayer];
-                SetNewPlayerName(idPlayer,name);
+                byte id = Convert.ToByte(idPlayer);
+                string name = _nameOfPlayer[id];
+                SetNewPlayerName(id,name);
             }
         }
 
@@ -98,18 +94,24 @@ namespace Client
         public static void AddIdPlaceIdPlayer()
         {
             byte count = 0;
-            foreach (byte  idPlayer in IdListPlayer)
+            foreach (int  idPlayer in _idListPlayer)
             {
-                if (IdPlayerToIdPlaceOnTable.ContainsKey(idPlayer))
+                byte id = Convert.ToByte(idPlayer);
+                if (_idPlayerToIdPlaceOnTable.ContainsKey(id))
                 {
-                    IdPlayerToIdPlaceOnTable[idPlayer] = count;
+                    _idPlayerToIdPlaceOnTable[id] = count;
                 }
                 else
                 {
-                    IdPlayerToIdPlaceOnTable.Add(idPlayer,count);
+                    _idPlayerToIdPlaceOnTable.Add(id,count);
                 }
                 count++;
             }
+        }
+    
+        public static string GetPlayerNameFromId(byte idPlayer)
+        {
+            return _nameOfPlayer[idPlayer];
         }
     }
 
@@ -121,7 +123,7 @@ namespace Client
         public static List<int> IdListPlayerToStartGame = new List<int>();
         public static Dictionary<int, string> NameOfRoom = new Dictionary<int, string>();
         public static Dictionary<int, string> NameOfPlayers = new Dictionary<int, string>();
-
+        //todo add MyIdRoom
         public static void ClearGameRoom()
         {
             NameRoom = String.Empty;
@@ -203,28 +205,29 @@ namespace Client
         {
             ClearGameRoom();
 
-            Network.ConnectToServer();
+            if (!Network.ConnectToServer()) return; //check the connection end return when not connected
             Network.BeginReceiveDataFromServer();
 
             NewRoom createRoom = new NewRoom();
+
             if (createRoom.ShowDialog() != true) return;
             if(createRoom.DialogResult != true) return;
-            //todo check correct set data from server??
-            //((MainWindow)Application.Current.MainWindow).CUserControl.Content 
-            //    = MyContentClassWindow.ChangeContent(ContNum.PlayersBoard);
+
             Network.SendCommand(GameSendCommand.StartGame);
-            //At this moment, server will control step of the game
+            //At this moment I Step: server will control step of the game
         }
 
         public static void JoinToRoom()
-        {//TODO
+        {
             ClearGameRoom();
 
-            Network.ConnectToServer();
+            if (!Network.ConnectToServer()) return; //check the connection end return when not connected
             Network.BeginReceiveDataFromServer();
             
             JoinWindowObj.WindowJoinRoom = new JoinRoom();
             JoinWindowObj.WindowJoinRoom.ShowDialog();
+
+            //waiting for control from server
         }
 
         public static void InitGame(byte playerAmount)

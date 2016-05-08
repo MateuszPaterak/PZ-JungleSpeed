@@ -5,10 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Client"
         mc:Ignorable="d"
-        Title="Wojna o totem" Height="700" Width="900">
+        Title="Wojna o totem" Height="700" Width="900" Closing="Window_Closing">
     <Grid Background="#FF0A2E08">
         <Menu x:Name="Menu" HorizontalAlignment="Left" Height="25" VerticalAlignment="Top" Width="900">
             <MenuItem Header="Rozgrywka">
+                <MenuItem Header="Adres IP serwera" Click="ConfigIpServer"></MenuItem>
                 <MenuItem Header="Utwórz nowy pokój" Click="NewRoom"></MenuItem>
                 <MenuItem Header="Dołącz do pokoju" Click="JoinToRoom"></MenuItem>
             </MenuItem>

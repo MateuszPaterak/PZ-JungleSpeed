@@ -17,12 +17,12 @@ namespace Client
         {
             InitializeComponent();
 
-            refreshAllListThread = new Thread(RefreshAllList);
-            refreshAllListThread.Start();
-
             BindLvListRoom();//start list view binding
             BindLvListPlayerToStart();
             BindLvPlayerList();
+
+            refreshAllListThread = new Thread(RefreshAllList);
+            refreshAllListThread.Start();
         }
 
         private void BtCreateRoom_Click(object sender, RoutedEventArgs e)
@@ -37,6 +37,7 @@ namespace Client
                 GameRoom.NameRoom = TBNameRoom.Text;
             }
             Network.SendCommand(GameSendCommand.CreateNewRoom);
+            Network.SendCommand(GameSendCommand.SendMyLogin);
         }
 
         private void BtRemoveRoom_Click(object sender, RoutedEventArgs e)
@@ -48,14 +49,15 @@ namespace Client
 
         private void BtRemovePlayer_Click(object sender, RoutedEventArgs e)
         {//remove selected player
-            if (LVPlayerList.SelectedIndex != -1)
-            {
-                byte[] selectedId = new byte[1];
-                ListViewRecord selected = (ListViewRecord)LVPlayerList.Items.GetItemAt(LVPlayerList.SelectedIndex);
-                if (selected.Name == GameClass.MyPlayerName) return; //don't remove myself //todo correct checking my id
-                selectedId[0] = Convert.ToByte(selected.Id);
-                Network.SendCommand(GameSendCommand.RemovePlayerFromRoom,selectedId);
-            }
+            if (LVPlayerList.SelectedIndex == -1) return;
+
+            byte[] selectedId = new byte[1];
+            ListViewRecord selected = (ListViewRecord)LVPlayerList.Items.GetItemAt(LVPlayerList.SelectedIndex);
+            if (selected.Name == GameClass.MyPlayerName) return; //don't remove myself 
+            //todo correct checking my id / add new communicate with myself id
+            selectedId[0] = Convert.ToByte(selected.Id);
+
+            Network.SendCommand(GameSendCommand.RemovePlayerFromRoom,selectedId);
         }
 
         private void BtStartGame_Click(object sender, RoutedEventArgs e)
@@ -72,14 +74,19 @@ namespace Client
             DialogResult = true; //true if room will be created
             Close();
         }
-
-        private void RefreshAllList()
+        
+        private void BtCancelCreateRoom_Click(object sender, RoutedEventArgs e)
         {
-            //+ sprawdzenie czy jest utworzona lista 
-            Refresh_LVListRoom();
-            Refresh_LVPlayerList();
-            Refresh_LVListPlayerToStart();
-            Thread.Sleep(1000);
+            if (GameRoom.NameRoom != null)
+            {
+                Network.SendCommand(GameSendCommand.CloseMyRoom);
+            }
+            GameRoom.NameRoom = null;
+
+            refreshAllListThread.Abort();
+            refreshAllListThread.Join();
+            DialogResult = false;
+            Close();
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -93,18 +100,17 @@ namespace Client
 
             refreshAllListThread.Abort();
             refreshAllListThread.Join();
+
+            DialogResult = false;
         }
 
-        private void BtCancelCreateRoom_Click(object sender, RoutedEventArgs e)
+        private void RefreshAllList()
         {
-            if (GameRoom.NameRoom != null)
-            {
-                Network.SendCommand(GameSendCommand.CloseMyRoom);
-            }
-            GameRoom.NameRoom = null;
-
-            refreshAllListThread.Abort();
-            refreshAllListThread.Join();
+            //+ check for created list
+            Refresh_LVListRoom();
+            Refresh_LVPlayerList();
+            Refresh_LVListPlayerToStart();
+            Thread.Sleep(1000);
         }
 
         private void BindLvListRoom()

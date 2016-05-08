@@ -16,7 +16,7 @@ namespace Client
         public static bool ConnectToServer()
         {
             var portOffset = 0;
-            if (MyClient==null)
+            if (MyClient==null)//not exist
             {
                 do
                 {
@@ -33,10 +33,15 @@ namespace Client
                     portOffset++;
                 } while (portOffset<11);
             }
-            if (MyClient == null) return false;
-            if (MyClient.Connected) return true;
+            if (MyClient == null) //not connected and exist after trying to connect
+            {
+                MessageBox.Show("Nie udało się nawiązać połączenia z serwerem");
+                return false;
+            }
+
+            if (MyClient.Connected) return true; //if exist before and connected
             
-            //not connected
+            //not connected before but exist
             portOffset = 0;
             do
             {
@@ -52,8 +57,9 @@ namespace Client
                 }
                 portOffset++;
             } while (portOffset < 11);
+
             MessageBox.Show("Nie udało się nawiązać połączenia z serwerem");
-            return false;
+            return false; //exist but not connected after trying to connect
         }
 
         public static void BeginReceiveDataFromServer()
@@ -62,15 +68,14 @@ namespace Client
             {
                 //if (MyClient != null && MyClient.Connected)
                 if (MyClient == null || !MyClient.Connected) return;
-                {
-                    MyClient.Client.BeginReceive(
+
+                MyClient.Client.BeginReceive(
                         _byteDataReceive,
                         0,
                         _byteDataReceive.Length,
                         SocketFlags.None,
                         OnReceiveLoop,
                         MyClient);
-                }
             }
             catch (Exception)
             {
@@ -87,7 +92,6 @@ namespace Client
             {
                 MyClient.Client.EndReceive(arg);
                 ReceiveCommand();
-                // MessageBox.Show("Odebrano od serwera: " + Encoding.UTF8.GetString(_byteData));
                 _byteDataReceive = new byte[1000];        
 
                 MyClient.Client.BeginReceive(
@@ -114,7 +118,7 @@ namespace Client
                 BeginSendComm(_byteDataSend);
 
                 MyClient.Close();
-                MessageBox.Show("Rozłączono z serwerem");
+                //MessageBox.Show("Rozłączono z serwerem");
             }
             else
             {
@@ -242,11 +246,17 @@ namespace Client
                         }
                         break;
                     }
-                case 11://todo display winner nick
+                case 11:
                     {//end of game
                         //destruct/reset game object
+                        var winnerId = _byteDataReceive[2];
+                        string winnerName = GameClass.GetPlayerNameFromId(winnerId);
+                        MessageBox.Show("Gra zakończona. \nWygrał gracz: "+ winnerName);
+
                         GameClass.ClearGameClass();
                         ((MainWindow)Application.Current.MainWindow).CUserControl.Content = new UCMainScreen();
+                        
+                        //todo check stop receive loop
                         break;
                     }
 
@@ -304,7 +314,7 @@ namespace Client
 
                         _byteDataSend = new byte[len];
                         _byteDataSend[1] = 54;//code
-                        Array.Copy(namebyte, 0, _byteDataSend, 2, _byteDataSend.Length);
+                        Array.Copy(namebyte, 0, _byteDataSend, 2, namebyte.Length);
                         _byteDataSend[0] = Convert.ToByte(_byteDataSend.Length);
                         
                         BeginSendComm(_byteDataSend);
@@ -400,7 +410,7 @@ namespace Client
 
                         _byteDataSend = new byte[len];
                         _byteDataSend[1] = 62;//code
-                        Array.Copy(namebyte, 0, _byteDataSend, 2, _byteDataSend.Length);
+                        Array.Copy(namebyte, 0, _byteDataSend, 2, namebyte.Length);
                         _byteDataSend[0] = Convert.ToByte(_byteDataSend.Length);
 
                         BeginSendComm(_byteDataSend);

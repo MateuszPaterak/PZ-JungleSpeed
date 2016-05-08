@@ -10,7 +10,7 @@ namespace Client
     };
     public static class MyContentClassWindow
     {
-        public static ContentControl ChangeContent(ContNum nr)
+        public static ContentControl ChangeContent(ContNum nr, byte numOfPlayers=2)
         {
             switch (nr)
             {
@@ -21,7 +21,7 @@ namespace Client
                 }
                     case ContNum.PlayersBoard:
                 {
-                    return new PlayersTableManager();
+                    return new PlayersTableManager(numOfPlayers);
                 }
                 case ContNum.StartPanel:
                 {

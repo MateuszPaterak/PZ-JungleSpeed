@@ -62,6 +62,9 @@
     <Compile Include="PlayOff.xaml.cs">
       <DependentUpon>PlayOff.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UCConfigServer.xaml.cs">
+      <DependentUpon>UCConfigServer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UCMainScreen.xaml.cs">
       <DependentUpon>UCMainScreen.xaml</DependentUpon>
     </Compile>
@@ -100,6 +103,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="PlayOff.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UCConfigServer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

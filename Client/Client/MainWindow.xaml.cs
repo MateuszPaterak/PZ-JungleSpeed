@@ -103,5 +103,10 @@ namespace Client
             ((MainWindow)Application.Current.MainWindow).CUserControl.Content =
                 new UCConfigServer();
         }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            Network.Disconnect();
+        }
     }
 }
