@@ -33,7 +33,7 @@ namespace Client
             {
                 _imgPlayerCardArray[nrPlayerOnTable].Source =
                  new BitmapImage(
-                         new Uri(@"/Pictures/Cards/" + cardNr.ToString() + ".png", UriKind.Relative));
+                         new Uri(@"/Pictures/Cards/" + cardNr.ToString() + ".jpg", UriKind.Relative));
             }
             catch (Exception)
             {
@@ -182,8 +182,8 @@ namespace Client
                     new Uri(@"/Pictures/" + name + ".png", UriKind.Relative)),
             };
             ImageBrush ib = new ImageBrush();
-            ib.ImageSource = new BitmapImage(new Uri("/Pictures/Cards/1.png", UriKind.Relative));
-            //GridPlayer.Background = new ImageBrush(new BitmapImage (new Uri("/Pictures/Cards/1.png", UriKind.Relative)));
+            ib.ImageSource = new BitmapImage(new Uri("/Pictures/Cards/1.jpg", UriKind.Relative));
+            //GridPlayer.Background = new ImageBrush(new BitmapImage (new Uri("/Pictures/Cards/1.jpg", UriKind.Relative)));
             Grid mygrid = new Grid();
             mygrid.Background = ib;
             //GridPlayer.Background = ib;
