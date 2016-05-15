@@ -40,7 +40,7 @@ namespace Client
             Network.SendCommand(GameSendCommand.SendMyLogin);
 
             BtJoinToGame.IsEnabled = true; //todo not ideal when room was full
-            BtExitFromGame.IsEnabled = true;
+            BtExitFromGame.IsEnabled = true; //todo set new button state when player will be deleted from player list
         }
 
         private void btExitFromRoom_Click(object sender, RoutedEventArgs e)
@@ -48,7 +48,7 @@ namespace Client
             Network.SendCommand(GameSendCommand.ExitFromRoom);
             GameRoom.ClearIdListPlayerToStartGame();
             GameRoom.ClearIdListPlayerInRoom();
-            Network.SendCommand(GameSendCommand.GetListAllRoom);
+            //Network.SendCommand(GameSendCommand.GetListAllRoom);
 
             BtJoinToGame.IsEnabled = false;
             BtExitFromGame.IsEnabled = false;
@@ -57,13 +57,13 @@ namespace Client
         private void btJoinToGame_Click(object sender, RoutedEventArgs e)
         {
             Network.SendCommand(GameSendCommand.JoinToGameInRoom);
-            Network.SendCommand(GameSendCommand.GetListAllPlayerInRoomToStartGame);
+            //Network.SendCommand(GameSendCommand.GetListAllPlayerInRoomToStartGame);
         }
 
-        private void btExitFromGame_Click(object sender, RoutedEventArgs e)
+        private void btExitFromGamePlay_Click(object sender, RoutedEventArgs e)
         {
             Network.SendCommand(GameSendCommand.ExitFromGameInRoom);
-            Network.SendCommand(GameSendCommand.GetListAllPlayerInRoomToStartGame);
+            //Network.SendCommand(GameSendCommand.GetListAllPlayerInRoomToStartGame);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -73,7 +73,6 @@ namespace Client
             //when window was closed - stop refresh list
             refreshAllListThread.Abort();
             refreshAllListThread.Join();
-
         }
 
         private void RefreshAllList()

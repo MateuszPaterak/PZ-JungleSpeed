@@ -44,7 +44,7 @@ namespace Client
         {
             Network.SendCommand(GameSendCommand.CloseMyRoom);
             GameRoom.NameRoom = null;
-            Network.SendCommand(GameSendCommand.GetListAllRoom);
+            Network.SendCommand(GameSendCommand.GetListAllRoom); //todo to commend?
         }
 
         private void BtRemovePlayer_Click(object sender, RoutedEventArgs e)
@@ -64,7 +64,7 @@ namespace Client
         {
             if (GameRoom.IdListPlayerToStartGame.Count < 2)
             {
-                MessageBox.Show("Musi być w pokoju przynajmniej dwóch graczy aby rozpocząć grę!.");
+                MessageBox.Show("Musi być w pokoju gotowych przynajmniej dwóch graczy aby rozpocząć grę!");
                 return; //start when in room are min 2 players
             }
         
