@@ -54,6 +54,7 @@
     <Compile Include="Gracze.cs" />
     <Compile Include="Karta.cs" />
     <Compile Include="LogikaGry.cs" />
+    <Compile Include="Pokoj.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Talia.cs" />

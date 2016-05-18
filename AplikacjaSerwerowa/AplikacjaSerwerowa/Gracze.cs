@@ -19,9 +19,9 @@ namespace AplikacjaSerwerowa
             WszyscyGracze.Add(new Gracz(r.Next(0,50)) { });
         }
 
-        public void SprawdzCzyNaStoleJestSymbol(Karta Karta1, int IDGracza, int liczbaGraczy)
+        public void SprawdzCzyNaStoleJestSymbol(Karta Karta1, int IDGracza)
         {
-            for (int i = 0; i < liczbaGraczy; i++)
+            for (int i = 0; i < WszyscyGracze.Count; i++)
             {
                 if ((WszyscyGracze[i].OnTable).Any())
                 {

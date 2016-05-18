@@ -9,14 +9,13 @@ namespace AplikacjaSerwerowa
 {
     public class Gracz
     {
-        public Socket _Socket { get; set; }
-        public string _Name { get; set; }
+        public Socket _Socket;
+        public string _Name;
         public int id;
         public bool isActive = false;
         public List<Karta> InHand = new List<Karta>();
         public List<Karta> OnTable = new List<Karta>();
         public Karta OstatniaKarta = new Karta();
-        private int p;
 
         public Gracz(int id)
         {
@@ -24,7 +23,15 @@ namespace AplikacjaSerwerowa
         }
         public Gracz(Socket socket)
         {
-                this._Socket = socket;
+                _Socket = socket;
+                _Name = "Bezimienny";
+        }
+        //wkrótce
+        public Gracz(int id, Socket socket, string nazwa)
+        {
+            this.id = id;
+            _Socket = socket;
+            _Name = nazwa;
         }
         public void PokazKarty(List<Karta> ZestawKart)
         {

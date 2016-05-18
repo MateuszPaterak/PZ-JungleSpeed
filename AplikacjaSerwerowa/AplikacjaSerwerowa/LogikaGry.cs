@@ -28,6 +28,7 @@ namespace AplikacjaSerwerowa
     {
 
         bool isWinner = false;
+        public int zwyciezca;
         Talia TaliaDoGry = new Talia();
         Gracze Grajacy = new Gracze();
         Karta temp = new Karta();
@@ -44,6 +45,21 @@ namespace AplikacjaSerwerowa
         }
         */
 
+        public LogikaGry(Pokoj glownyPokoj)
+        {
+
+        }
+
+        public int ZwrocIdGracza(int a)
+        {
+            /*
+            for(var i=0; i<?){
+            }
+            Grajacy.WszyscyGracze[i - 1]
+             */
+            return a;
+        }
+
         public void Run()
         {
 
@@ -55,7 +71,7 @@ namespace AplikacjaSerwerowa
             TaliaDoGry.PokazTalie();
 
             Console.WriteLine("Ilu ma być graczy?");
-            liczbaGraczy = Form1.__ClientSockets.Count();
+            liczbaGraczy = Form1.Pokoj1.WszyscyGracze.Count();
             Console.Write(liczbaGraczy + "\n");
 
             for (int i = 0; i < liczbaGraczy; i++)
@@ -86,6 +102,7 @@ namespace AplikacjaSerwerowa
                 //normalny ruch
                 for (int j = 0; j < liczbaGraczy; j++)
                 {
+                    ZwrocIdGracza(j);
                     if (Grajacy.WszyscyGracze[j].InHand.Any())
                     {
                         for (int i = 0; i < 1; i++)
@@ -102,12 +119,12 @@ namespace AplikacjaSerwerowa
                         }
                         */
                         Grajacy.WszyscyGracze[j].OnTable.Add(temp); //wyrzucenie 1 karty na stol
-                        Grajacy.SprawdzCzyNaStoleJestSymbol(temp, j, liczbaGraczy);
+                        Grajacy.SprawdzCzyNaStoleJestSymbol(temp, j);
                         Grajacy.WszyscyGracze[j].InHand.RemoveRange(0, 1); //usuniecie karty z reki
                     }
                     else if (Grajacy.WszyscyGracze[j].OnTable.Any())
                     {
-                        Grajacy.SprawdzCzyNaStoleJestSymbol(Grajacy.WszyscyGracze[j].OnTable[Grajacy.WszyscyGracze[j].OnTable.Count - 1], j, liczbaGraczy);
+                        Grajacy.SprawdzCzyNaStoleJestSymbol(Grajacy.WszyscyGracze[j].OnTable[Grajacy.WszyscyGracze[j].OnTable.Count - 1], j);
                     }
 
                     for (int i = 1; i <= liczbaGraczy; i++)
@@ -168,6 +185,7 @@ namespace AplikacjaSerwerowa
                 if (!(Grajacy.WszyscyGracze[i].InHand).Any() && !(Grajacy.WszyscyGracze[i].OnTable).Any())
                 {
                     isWinner = true;
+                    zwyciezca = i;
                     Console.WriteLine("Zwyciężył gracz: " + (i + 1) + ". GRATULUJĘ!");
                 }
                 if (isWinner == true)
