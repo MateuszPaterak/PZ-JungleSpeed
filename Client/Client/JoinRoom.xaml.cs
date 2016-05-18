@@ -209,7 +209,7 @@ namespace Client
             //sprawdzenie czy jest się w wątku obsługującym tę kontrolkę, 
             //jeśli nie to trzeba w dalszym kroku przełączyć się na niego
             {
-                Dispatcher.Invoke(ClearAllIn_LVListRoom);  //przełączenie się na wątek naszej kontrolki
+                Dispatcher.Invoke(()=>AddItemTo_LVListRoom(item));  //przełączenie się na wątek naszej kontrolki
             }
             else
             {
@@ -221,7 +221,7 @@ namespace Client
         {
             if (!LVListOfPlayer.Dispatcher.CheckAccess())
             {
-                Dispatcher.Invoke(ClearAllIn_LVPlayerList);
+                Dispatcher.Invoke(()=> AddItemTo_LVPlayerList(item));
             }
             else
             {
@@ -233,7 +233,7 @@ namespace Client
         {
             if (!LVListOfPlayerToStart.Dispatcher.CheckAccess())
             {
-                Dispatcher.Invoke(ClearAllIn_LVListPlayerToStart);
+                Dispatcher.Invoke(()=>AddItemTo_LVListPlayerToStart(item));
             }
             else
             {

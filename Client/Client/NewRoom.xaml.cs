@@ -107,10 +107,14 @@ namespace Client
         private void RefreshAllList()
         {
             //+ check for created list
-            Refresh_LVListRoom();
-            Refresh_LVPlayerList();
-            Refresh_LVListPlayerToStart();
-            Thread.Sleep(1000);
+            while (true)
+            {
+                Refresh_LVListRoom();
+                Refresh_LVPlayerList();
+                Refresh_LVListPlayerToStart();
+                Thread.Sleep(1000);
+            }
+            //RefreshAllList();
         }
 
         private void BindLvListRoom()
@@ -238,7 +242,7 @@ namespace Client
             //sprawdzenie czy jest się w wątku obsługującym tę kontrolkę, 
             //jeśli nie to trzeba w dalszym kroku przełączyć się na niego
             {
-                Dispatcher.Invoke(ClearAllIn_LVListRoom);  //przełączenie się na wątek naszej kontrolki
+                Dispatcher.Invoke(()=>AddItemTo_LVListRoom(item));  //przełączenie się na wątek naszej kontrolki
             }
             else
             {
@@ -250,7 +254,7 @@ namespace Client
         {
             if (!LVPlayerList.Dispatcher.CheckAccess())
             {
-                Dispatcher.Invoke(ClearAllIn_LVPlayerList);
+                Dispatcher.Invoke(()=> AddItemTo_LVPlayerList(item));
             }
             else
             {
@@ -262,7 +266,7 @@ namespace Client
         {
             if (!LVListPlayerToStart.Dispatcher.CheckAccess())
             {
-                Dispatcher.Invoke(ClearAllIn_LVListPlayerToStart);
+                Dispatcher.Invoke(()=>AddItemTo_LVListPlayerToStart(item));
             }
             else
             {

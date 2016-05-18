@@ -85,11 +85,11 @@ namespace Client
 
         private static void OnReceiveLoop(IAsyncResult arg)
         {
-            if (MyClient == null) return;
-            if (!MyClient.Connected) return;
-
             try
             {
+                if (MyClient == null) return;
+                if (!MyClient.Connected) return;
+
                 MyClient.Client.EndReceive(arg);
                 ReceiveCommand();
                 _byteDataReceive = new byte[1000];        
@@ -110,19 +110,26 @@ namespace Client
 
         public static void Disconnect()
         {
-            if (MyClient!=null && MyClient.Connected)
+            try
             {
-                _byteDataSend = new byte[2];
-                _byteDataSend[1] = 53;//code
-                _byteDataSend[0] = Convert.ToByte(_byteDataSend.Length);
-                BeginSendComm(_byteDataSend);
+                if (MyClient != null && MyClient.Connected)
+                {
+                    _byteDataSend = new byte[2];
+                    _byteDataSend[1] = 53; //code
+                    _byteDataSend[0] = Convert.ToByte(_byteDataSend.Length);
+                    BeginSendComm(_byteDataSend);
 
-                MyClient.Close();
-                //MessageBox.Show("Rozłączono z serwerem");
+                    MyClient.Close();
+                    //MessageBox.Show("Rozłączono z serwerem");
+                }
+                else
+                {
+                    //MessageBox.Show("Klient był już rozłączony");
+                }
             }
-            else
+            catch (Exception)
             {
-                //MessageBox.Show("Klient był już rozłączony");
+                //ignored
             }
         }
 
