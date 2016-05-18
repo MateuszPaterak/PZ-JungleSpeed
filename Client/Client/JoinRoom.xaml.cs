@@ -78,10 +78,13 @@ namespace Client
         private void RefreshAllList()
         {
             //+ check for created list
-            Refresh_LVListRoom();
-            Refresh_LVPlayerList();
-            Refresh_LVListPlayerToStart();
-            Thread.Sleep(1000);
+            while (true)
+            {
+                Refresh_LVListRoom();
+                Refresh_LVPlayerList();
+                Refresh_LVListPlayerToStart();
+                Thread.Sleep(1000);
+            }
         }
 
         private void BindLvListRoom()
