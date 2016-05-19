@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,6 +13,8 @@ namespace Client
     public partial class JoinRoom : Window
     {
         private Thread refreshAllListThread;
+        private volatile bool _runningRefresh;
+        private volatile object _selectedItem;
         public JoinRoom()
         {
             InitializeComponent();
@@ -20,13 +23,14 @@ namespace Client
             BindLvListPlayerToStart();
             BindLvPlayerList();
 
+            _runningRefresh = true;
             refreshAllListThread = new Thread(RefreshAllList);
             refreshAllListThread.Start();
-
-            Network.SendCommand(GameSendCommand.GetListAllRoom);
-
+            
             BtJoinToGame.IsEnabled = false;
             BtExitFromGame.IsEnabled = false;
+
+            Network.SendCommand(GameSendCommand.GetListAllRoom);
         }
 
         private void btJoinToRoom_Click(object sender, RoutedEventArgs e)
@@ -69,12 +73,13 @@ namespace Client
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             // Network.SendCommand(GameSendCommand.ExitFromRoom); //exit 
-            //todo
-
+            
             //when window was closed - stop refresh list
             try
             {
-                refreshAllListThread.Abort();
+                _runningRefresh = false;
+                Thread.Sleep(1500);
+                refreshAllListThread.Interrupt(); //todo check closing thread
                 refreshAllListThread.Join();
             }
             catch (Exception)
@@ -82,20 +87,26 @@ namespace Client
                 //ignored
             }
         }
-
-        private void RefreshAllList()
+        
+        public void RefreshAllList()
         {
-            //+ check for created list
-            while (true)
+            try
             {
-                Refresh_LVListRoom();
-                Refresh_LVPlayerList();
-                Refresh_LVListPlayerToStart();
-                Thread.Sleep(5000);
+                while (_runningRefresh)
+                {
+                    Refresh_LVListRoom();
+                    Refresh_LVPlayerList();
+                    Refresh_LVListPlayerToStart();
+                    Thread.Sleep(1000);
+                }
+            }
+            catch (ThreadInterruptedException)
+            {
+                _runningRefresh = false;
             }
         }
 
-        private void BindLvListRoom()
+        public void BindLvListRoom()
         {
             var gridView = new GridView();
             LVListOfRoom.View = gridView;
@@ -111,7 +122,7 @@ namespace Client
             });
         }
 
-        private void BindLvPlayerList()
+        public void BindLvPlayerList()
         {
             var gridView = new GridView();
             LVListOfPlayer.View = gridView;
@@ -127,7 +138,7 @@ namespace Client
             });
         }
 
-        private void BindLvListPlayerToStart()
+        public void BindLvListPlayerToStart()
         {
             var gridView = new GridView();
             LVListOfPlayerToStart.View = gridView;
@@ -142,17 +153,70 @@ namespace Client
                 DisplayMemberBinding = new Binding("Name")
             });
         }
-        
+
         private void Refresh_LVListRoom()
+        {
+            GetSelectedRoom();
+
+            try
+            { 
+                ClearAllIn_LVListRoom();//clear
+                foreach (var room in GameRoom.IdListRoom) //add new value
+                {
+                    string name = GameRoom.NameOfRoom[room];
+                    AddItemTo_LVListRoom(new ListViewRecord(room, name));
+                }
+
+                if (_selectedItem!=null ) //select row
+                {
+                    SelectRoom(_selectedItem);
+                }
+            }
+            catch (Exception)
+            {
+                //ignored
+            }
+        }
+
+        private void GetSelectedRoom()
         {
             try
             {
-                ClearAllIn_LVListRoom();//clear
-
-                foreach (var room in GameRoom.IdListRoom) //add new value
+                if (!LVListOfRoom.Dispatcher.CheckAccess())//check to we are now in controls thread. If no, we must turn to it
                 {
-                     string name = GameRoom.NameOfRoom[room];
-                     AddItemTo_LVListRoom(new ListViewRecord(room, name));
+                    Dispatcher.Invoke(GetSelectedRoom); //turn to controls thread
+                }
+                else
+                {
+                    _selectedItem = LVListOfRoom.SelectedItem;
+                }
+            }
+            catch (Exception)
+            {
+                //ignored
+            }
+        }
+
+        private void SelectRoom(object selectedObject)
+        {
+            try
+            {
+                if (!LVListOfRoom.Dispatcher.CheckAccess())
+                {
+                    Dispatcher.Invoke(()=>SelectRoom(selectedObject));
+                }
+                else
+                {
+                    ListViewRecord mySelectedRecord = (ListViewRecord)selectedObject;
+                    for (var i = 0; i < LVListOfRoom.Items.Count; i++)
+                    {
+                        var obj = LVListOfRoom.Items.GetItemAt(i);
+                        ListViewRecord rec = (ListViewRecord) obj;
+
+                        if (rec.Id != mySelectedRecord.Id) continue;
+                        LVListOfRoom.SelectedIndex = i;
+                        break;
+                    }
                 }
             }
             catch (Exception)
@@ -169,8 +233,8 @@ namespace Client
 
                 foreach (var room in GameRoom.IdListPlayerInRoom) //add new value
                 {
-                        string name = GameRoom.NameOfPlayers[room];
-                        AddItemTo_LVPlayerList(new ListViewRecord(room, name));   
+                    string name = GameRoom.NameOfPlayers[room];
+                    AddItemTo_LVPlayerList(new ListViewRecord(room, name));
                 }
             }
             catch (Exception)
@@ -186,9 +250,9 @@ namespace Client
                 ClearAllIn_LVListPlayerToStart();//clear
 
                 foreach (var room in GameRoom.IdListPlayerToStartGame) //add new value
-                {   
-                        string name = GameRoom.NameOfPlayers[room];
-                        AddItemTo_LVListPlayerToStart(new ListViewRecord(room, name));
+                {
+                    string name = GameRoom.NameOfPlayers[room];
+                    AddItemTo_LVListPlayerToStart(new ListViewRecord(room, name));
                 }
             }
             catch (Exception)
@@ -213,7 +277,7 @@ namespace Client
             catch (Exception)
             {
                 //ignored
-            }            
+            }
         }
 
         private void ClearAllIn_LVPlayerList()
@@ -310,7 +374,7 @@ namespace Client
                 //ignored
             }
         }
-
+        
         public class ListViewRecord
         {
             public int Id { get; set; }

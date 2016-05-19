@@ -224,9 +224,16 @@ namespace Client
 
             if (!Network.ConnectToServer()) return; //check the connection end return when not connected
             Network.BeginReceiveDataFromServer();
-            
-            JoinWindowObj.WindowJoinRoom = new JoinRoom();
-            JoinWindowObj.WindowJoinRoom.ShowDialog();
+
+            try
+            {
+                JoinWindowObj.WindowJoinRoom = new JoinRoom();
+                JoinWindowObj.WindowJoinRoom.ShowDialog();
+            }
+            catch (Exception)
+            {
+                //ignored
+            }
 
             //waiting for control from server
         }

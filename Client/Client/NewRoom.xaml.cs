@@ -12,7 +12,9 @@ namespace Client
     /// </summary>
     public partial class NewRoom : Window
     {
-        private Thread refreshAllListThread;
+        private Thread _refreshAllListThread;
+        private volatile bool _runningRefresh;
+        private volatile object _selectedItem;
         public NewRoom()
         {//todo autochecked list when was checked
             InitializeComponent();
@@ -21,8 +23,9 @@ namespace Client
             BindLvListPlayerToStart();
             BindLvPlayerList();
 
-            refreshAllListThread = new Thread(RefreshAllList);
-            refreshAllListThread.Start();
+            _runningRefresh = true;
+            _refreshAllListThread = new Thread(RefreshAllList);
+            _refreshAllListThread.Start();
         }
 
         private void BtCreateRoom_Click(object sender, RoutedEventArgs e)
@@ -95,6 +98,9 @@ namespace Client
                     
                     GameRoom.NameRoom = null;
                     DialogResult = false;
+                    _runningRefresh = false;
+                    _refreshAllListThread.Interrupt();
+                    _refreshAllListThread.Join();
                     return;
                 }
                 if (!DialogResult.Value) //new room was not created and started
@@ -111,9 +117,10 @@ namespace Client
             }
 
             try
-            {
-                refreshAllListThread.Abort();//when window was closed - stop refresh list
-                refreshAllListThread.Join();
+            {//when window was closed - stop refresh list
+                _runningRefresh = false;
+                _refreshAllListThread.Interrupt();
+                _refreshAllListThread.Join();
             }
             catch (Exception)
             {
@@ -123,13 +130,19 @@ namespace Client
 
         private void RefreshAllList()
         {
-            //+ check for created list
-            while (true)
+            try
             {
-                Refresh_LVListRoom();
-                Refresh_LVPlayerList();
-                Refresh_LVListPlayerToStart();
-                Thread.Sleep(5000);
+                while (_runningRefresh)
+                {
+                    Refresh_LVListRoom();
+                    Refresh_LVPlayerList();
+                    Refresh_LVListPlayerToStart();
+                    Thread.Sleep(1000);
+                }
+            }
+            catch (ThreadInterruptedException)
+            {
+                _runningRefresh = false;
             }
         }
 
@@ -183,14 +196,68 @@ namespace Client
 
         private void Refresh_LVListRoom()
         {
+
+            GetSelectedRoom();
+
             try
             {
                 ClearAllIn_LVListRoom();//clear
-
                 foreach (var room in GameRoom.IdListRoom) //add new value
                 {
-                        string name = GameRoom.NameOfRoom[room];
-                        AddItemTo_LVListRoom(new ListViewRecord(room, name));   
+                    string name = GameRoom.NameOfRoom[room];
+                    AddItemTo_LVListRoom(new ListViewRecord(room, name));
+                }
+
+                if (_selectedItem != null) //select row
+                {
+                    SelectRoom(_selectedItem);
+                }
+            }
+            catch (Exception)
+            {
+                //ignored
+            }
+        }
+
+        private void GetSelectedRoom()
+        {
+            try
+            {
+                if (!LVListRoom.Dispatcher.CheckAccess())//check to we are now in controls thread. If no, we must turn to it
+                {
+                    Dispatcher.Invoke(GetSelectedRoom); //turn to controls thread
+                }
+                else
+                {
+                    _selectedItem = LVListRoom.SelectedItem;
+                }
+            }
+            catch (Exception)
+            {
+                //ignored
+            }
+        }
+
+        private void SelectRoom(object selectedObject)
+        {
+            try
+            {
+                if (!LVListRoom.Dispatcher.CheckAccess())
+                {
+                    Dispatcher.Invoke(() => SelectRoom(selectedObject));
+                }
+                else
+                {
+                    ListViewRecord mySelectedRecord = (ListViewRecord)selectedObject;
+                    for (var i = 0; i < LVListRoom.Items.Count; i++)
+                    {
+                        var obj = LVListRoom.Items.GetItemAt(i);
+                        ListViewRecord rec = (ListViewRecord)obj;
+
+                        if (rec.Id != mySelectedRecord.Id) continue;
+                        LVListRoom.SelectedIndex = i;
+                        break;
+                    }
                 }
             }
             catch (Exception)
