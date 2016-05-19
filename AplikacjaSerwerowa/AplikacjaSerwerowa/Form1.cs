@@ -12,20 +12,20 @@ using System.Net.Sockets;
 
 namespace AplikacjaSerwerowa
 {
-	public enum GameSendCommand
-	{
-		NumberOfCards, //1
-		ListAllPlayerIDs, //2
-		ActivateGetUpCardButton, //3
-		DeactivateGetUpCardButton, //4
-		PickedCard,//5
-		DuelWin,//6
-		DuelLose,//7
-		ListAllRooms,//8
-		ListAllPlayerInRoom,//9
-		ListAllPlayerInRoomToStartGame,//10
-		EndOfGame,//11
-	};
+    public enum GameSendCommand
+    {
+        NumberOfCards, //1
+        ListAllPlayerIDs, //2
+        ActivateGetUpCardButton, //3
+        DeactivateGetUpCardButton, //4
+        PickedCard,//5
+        DuelWin,//6
+        DuelLose,//7
+        ListAllRooms,//8
+        ListAllPlayerInRoom,//9
+        ListAllPlayerInRoomToStartGame,//10
+        EndOfGame,//11
+    };
 
     public partial class Form1 : Form
     {
@@ -37,21 +37,23 @@ namespace AplikacjaSerwerowa
             SetupServer();
         }
 
-        public byte[] temp2byte;
+        public byte[] temp2byte = new byte[256];
+        int licznikDlugosci = 0;
         private byte[] _buffer = new byte[256];
         private byte[] byteToSend = new byte[256];
         private byte[] _toSend = new byte[256];
         private byte[] _messageContent = new byte[256];
         public static Gracze Pokoj1 = new Gracze();
+        public static Gracze RozgrywkaPokoj1 = new Gracze();
         public Socket _serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-        
+        Random r = new Random();
+
 
         #region Rzeczy do zmienienia
-        public static Pokoj glownyPokoj = new Pokoj(0,"Glowny pokoj");
-        LogikaGry NowaGra = new LogikaGry(glownyPokoj);
+        public static Pokoj glownyPokoj = new Pokoj(0, "Glowny pokoj");
         #endregion
 
-        int dlugoscPakietu, kodWiadomosci;
+        public int dlugoscPakietu, kodWiadomosci;
         string daneWiadomosci = "", nazwaKlienta = "";
 
         private void Form1_Load(object sender, EventArgs e)
@@ -78,7 +80,8 @@ namespace AplikacjaSerwerowa
         {
             Socket socket = _serverSocket.EndAccept(ar);
 
-            Pokoj1.WszyscyGracze.Add(new Gracz(socket));
+            //zrobic tak, zeby wartosci losowe nie mogly sie powtarzac
+            Pokoj1.WszyscyGracze.Add(new Gracz(r.Next(0,50),socket));
             listaGraczy.Items.Add(socket.RemoteEndPoint.ToString());
 
             dziennik.Items.Add("Hura, dołączył kolejny gracz! Obecna liczba graczy to: " + Pokoj1.WszyscyGracze.Count.ToString());
@@ -119,47 +122,50 @@ namespace AplikacjaSerwerowa
 
                     dlugoscPakietu = _buffer[0];
                     kodWiadomosci = _buffer[1];
-                    if((dlugoscPakietu-2)>0){
-                        for (int i = 0; i < dlugoscPakietu - 2; i++) {//slice etc.?
-                            _messageContent[i] = _buffer[2+i];
+                    if ((dlugoscPakietu - 2) > 0)
+                    {
+                        _messageContent = new byte[dlugoscPakietu - 2];
+                        for (int i = 0; i < dlugoscPakietu - 2; i++)
+                        {//slice etc.?
+                            _messageContent[i] = _buffer[2 + i];
                         }
                     }
 
                     switch (kodWiadomosci)
                     {
-					//DOIMPLEMENTOWAĆ
-					//gracz żąda podniesienia totemu
-						case 50:
+                        //DOIMPLEMENTOWAĆ
+                        //gracz żąda podniesienia totemu
+                        case 50:
                             {
                                 dziennik.Items.Add("Gracz " + nazwaKlienta + " chwycił totem");
-                                for (int i = 0; i < Pokoj1.WszyscyGracze.Count; i++)
+                                for (int i = 0; i < RozgrywkaPokoj1.WszyscyGracze.Count; i++)
                                 {
-                                    if (socket == Pokoj1.WszyscyGracze[i]._Socket)
+                                    if (socket == RozgrywkaPokoj1.WszyscyGracze[i]._Socket)
                                     {
-                                        Pokoj1.SprawdzCzyNaStoleJestSymbol(Pokoj1.WszyscyGracze[i].OnTable
-                                            [Pokoj1.WszyscyGracze[i].OnTable.Count-1], Pokoj1.WszyscyGracze[i].id);
+                                        RozgrywkaPokoj1.SprawdzCzyNaStoleJestSymbol(RozgrywkaPokoj1.WszyscyGracze[i].OnTable
+                                            [RozgrywkaPokoj1.WszyscyGracze[i].OnTable.Count - 1], RozgrywkaPokoj1.WszyscyGracze[i].id);
                                     }
                                     //SendCommand 2x (do zwyciezcy i do przegranego)
                                 }
-                                
+
                                 break;
                             }
-					//DOIMPLEMENTOWAĆ PÓŹNIEJ
-                    //gracz wybiera papier, kamień lub nożyce
-						//zawartość wiadomości P:[1],K:[2],N:[3];
-						case 51:
+                        //DOIMPLEMENTOWAĆ PÓŹNIEJ
+                        //gracz wybiera papier, kamień lub nożyce
+                        //zawartość wiadomości P:[1],K:[2],N:[3];
+                        case 51:
                             {
                                 dziennik.Items.Add("Gracz " + nazwaKlienta + " wybrał " + daneWiadomosci);
                                 break;
                                 //tego nie kmin na razie, bo dodatkowe
                             }
-					//gracz zażądał odwrócenia karty ze swojego stosu kart zakrytych
+                        //gracz zażądał odwrócenia karty ze swojego stosu kart zakrytych
                         case 52:
                             {
                                 dziennik.Items.Add("Gracz " + nazwaKlienta + " obrócił kartę");
-                                for (int i = 0; i < Pokoj1.WszyscyGracze.Count; i++)
+                                for (int i = 0; i < RozgrywkaPokoj1.WszyscyGracze.Count; i++)
                                 {
-                                    if (socket == Pokoj1.WszyscyGracze[i]._Socket)
+                                    if (socket == RozgrywkaPokoj1.WszyscyGracze[i]._Socket)
                                     {
                                         //kod na odwrocenie (przerobic lekko logike)
                                     }
@@ -176,7 +182,7 @@ namespace AplikacjaSerwerowa
                                 dziennik.Items.Add("Gracz " + nazwaKlienta + " niestety wyszedł z gry :(");
 
                                 //CzyjRuch.Gracz
-                                for (int i = 0; i < Pokoj1.WszyscyGracze.Count; i++)
+                                for (int i = 0; i < RozgrywkaPokoj1.WszyscyGracze.Count; i++)
                                 {
 
                                     //DOIMPLEMENTUJ TO GUNWO
@@ -210,15 +216,16 @@ namespace AplikacjaSerwerowa
                             {
                                 dziennik.Items.Add("Gracz " + nazwaKlienta + " zażądał podania nazw oraz ID wszystkich dostępnych pokoi");
                                 //poinformowanie gracza o dostępnych pokojach
-                                SendCommand(GameSendCommand.ListAllRooms, 0 , 0, socket, 0);
+                                SendCommand(GameSendCommand.ListAllRooms, 0, 0, socket, 0);
                                 break;
                             }
                         case 56:
                             {
                                 //na szytwno bo jest 1 pokój xD
                                 //potem trzeba dopisac obsluge pola [ID pokoju(byte)]
+                                //w tej chwili jest na 4 pozycji sendcommand "0", czyli zawsze podaje liste ludzi z pokoju o numerze "0"
                                 dziennik.Items.Add("Gracz " + nazwaKlienta + " zażądał podania nazw graczy oraz ID gracz z danego pokoju");
-                                //poinformowanie gracza o dostępnych pokojach
+                                //poinformowanie gracza o dostępnych w pokoju graczach
                                 SendCommand(GameSendCommand.ListAllPlayerInRoom, 0, 0, socket, 0);
                                 break;
                             }
@@ -234,9 +241,11 @@ namespace AplikacjaSerwerowa
                             }
                         case 58:
                             {
-                                //na sztywno jest
+                                //na sztywno jest //na razie zbędnę, bo jest 1 pokój, w którym lista użytkowników = lista obecnych na serwerze
                                 dziennik.Items.Add("Gracz " + nazwaKlienta + " chce dolaczyc do pokoju");
                                 //dodaj do pokoju
+                                SendCommand(GameSendCommand.ListAllPlayerInRoom, 0, 0, null, 0);
+                                //wyslij liste z graczami
                                 break;
                             }
                         case 59:
@@ -250,12 +259,20 @@ namespace AplikacjaSerwerowa
                             {
                                 //na sztywno jest
                                 dziennik.Items.Add("Gracz " + nazwaKlienta + " chce dolaczyc do gry w pokoju");
-                                //potem
+                                for (int i = 0; i < Pokoj1.WszyscyGracze.Count; i++)
+                                {
+                                    if (socket == Pokoj1.WszyscyGracze[i]._Socket)
+                                    {
+                                        RozgrywkaPokoj1.WszyscyGracze.Add(Pokoj1.WszyscyGracze[i]);
+                                    }
+                                }
+                                //wyslij liste z graczami bioracymi udzial
+                                SendCommand(GameSendCommand.ListAllPlayerInRoomToStartGame, 0, 0, null, 0);
                                 break;
                             }
                         case 61:
                             {
-                                //na sztywno jest
+                                //na sztywno jest //na razie zbedne
                                 dziennik.Items.Add("Gracz " + nazwaKlienta + " chce odlaczyc sie od rozgrywki");
                                 //potem
                                 break;
@@ -264,81 +281,36 @@ namespace AplikacjaSerwerowa
                             {
                                 //na sztywno jest
                                 dziennik.Items.Add("Gracz " + nazwaKlienta + " chce utworzyc pokoj");
-                                //potem
+                                glownyPokoj.nazwa = Encoding.UTF8.GetString(_messageContent);
                                 break;
                             }
                         case 63:
                             {
-                                //na sztywno jest
+                                //na sztywno jest //na razie zbedne
                                 dziennik.Items.Add("Gracz " + nazwaKlienta + " chce usunac swoj pokoj");
                                 //potem
                                 break;
                             }
                         case 64:
                             {
-                                //na sztywno jest
-                                dziennik.Items.Add("Gracz " + nazwaKlienta + " chce usunac swoj pokoj");
+                                //na sztywno jest //na razie zbedne
+                                dziennik.Items.Add("Gracz " + nazwaKlienta + " chce usunac gracza z pokoju pokoj");
                                 //uwun konkretnego gracza
                                 break;
                             }
                         case 65:
                             {
                                 dziennik.Items.Add("Gracz " + nazwaKlienta + " zażądał rozpoczęcia gry");
-                                //na razie na sztywno, ale tu musi byc doimlementowane
-                                NowaGra.Run();
+                                SendCommand(GameSendCommand.ListAllPlayerIDs, 0, 0, null, 0); //kod 2
+                                Run();
                                 break;
                             }
                         default:
-                            dziennik.Items.Add("WIADOMOSC NIEISTOTNA");
-                            break;
+                                dziennik.Items.Add("WIADOMOSC NIEISTOTNA");
+                                break;
                     }
-                    /*
-                    if (msgToSend.cmdCommand != Command.List)   //List messages are not broadcasted
-                    {
-                        message = msgToSend.ToByte();
-
-                        foreach (KlientSerwera client in __ClientSockets)
-                        {
-                            if (client._Socket != socket ||
-                                msgToSend.cmdCommand != Command.Login)
-                            {
-                                //Send the message to all users
-                                client._Socket.BeginSend(message, 0, message.Length, SocketFlags.None,
-                                    new AsyncCallback(SendCallback), client._Socket);
-                            }
-                        }
-
-                        Invoke((MethodInvoker)delegate()
-                        {
-                            dziennik.Items.Add(msgToSend.strMessage);
-                        });
-                    }*/
-
-                    /*
-
-                    //If the user is logging out then we need not listen from her
-                    if (msgReceived.cmdCommand != Command.Logout)
-                    {
-                        //Start listening to the message send by the user
-                        socket.BeginReceive(message, 0, message.Length, SocketFlags.None, new AsyncCallback(ReceiveCallback), socket);
-                    }
-                    */
-
-                    //Dziennik.Text = "Otrzymano tekst: " + text;
-
-
-                    /*
-                    for (int i = 0; i < __ClientSockets.Count; i++)
-                    {
-                        if (socket.RemoteEndPoint.ToString().Equals(__ClientSockets[i]._Socket.RemoteEndPoint.ToString()))
-                        {
-                            dziennik.Items.Add("\n" + __ClientSockets[i]._Socket.RemoteEndPoint.ToString() + ": " + text);
-                        }
-                    }
-                     */
-
                 }
-               
+
                 else
                 {
                     for (int i = 0; i < Pokoj1.WszyscyGracze.Count; i++)
@@ -350,182 +322,192 @@ namespace AplikacjaSerwerowa
                         }
                     }
                 }
-                
+
             }
             socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, new AsyncCallback(ReceiveCallback), socket);
         }
 
-        
-
-		public void SendCommand(GameSendCommand command, int idGracza, int idKarty, Socket socket, int idPokoju, byte[] arg=null)
-		{
-			switch (command)
-			{
-			case GameSendCommand.PickedCard:
-				{
-					_toSend = new byte[4];
-					_toSend[3] = Convert.ToByte(idKarty);
-					_toSend[2] = Convert.ToByte(idGracza);
-					_toSend[1] = 5;//code
-					_toSend[0] = Convert.ToByte(_toSend.Length);
-					SendDataToALL(_toSend);
-					break;
-				}
-                case GameSendCommand.ListAllRooms:
-                {
-                    //na razie sztywniutko (1 pokój)
-                    byte[] stringbyte = Encoding.UTF8.GetBytes(glownyPokoj.nazwa);
-                    _toSend = new byte[5 + stringbyte.Length];
-                    Array.Copy(stringbyte, 0, _toSend, 5, stringbyte.Length);
-                    _toSend[4] = Convert.ToByte(glownyPokoj.nazwa.Length);
-                    _toSend[3] = Convert.ToByte(glownyPokoj.id);
-                    _toSend[2] = Convert.ToByte(1);
-                    _toSend[1] = 8;//code
-                    _toSend[0] = Convert.ToByte(_toSend.Length);
-                    Sendata(socket, _toSend);
-                    break;
-                }
-                case GameSendCommand.ListAllPlayerInRoom:
-                {
-                    //na razie sztywniutko (1 pokój)
-                    for (int i = 0; i < Pokoj1.WszyscyGracze.Count; i++)
+        public void SendCommand(GameSendCommand command, int idGracza, int idKarty, Socket socket, int idPokoju, byte[] arg = null)
+        {
+            switch (command)
+            {
+                case GameSendCommand.PickedCard:
                     {
-                            byte[] tempbyte = new byte[2+Pokoj1.WszyscyGracze[i]._Name.Length];
-                            tempbyte[0]=Convert.ToByte(Pokoj1.WszyscyGracze[i].id);
+                        _toSend = new byte[4];
+                        _toSend[3] = Convert.ToByte(idKarty);
+                        _toSend[2] = Convert.ToByte(idGracza);
+                        _toSend[1] = 5;//code
+                        _toSend[0] = Convert.ToByte(_toSend.Length);
+                        SendDataToALL(_toSend);
+                        break;
+                    }
+                case GameSendCommand.ListAllRooms:
+                    {
+                        //na razie sztywniutko (1 pokój)
+                        byte[] stringbyte = Encoding.UTF8.GetBytes(glownyPokoj.nazwa);
+                        _toSend = new byte[5 + stringbyte.Length];
+                        Array.Copy(stringbyte, 0, _toSend, 5, stringbyte.Length);
+                        _toSend[4] = Convert.ToByte(glownyPokoj.nazwa.Length);
+                        _toSend[3] = Convert.ToByte(glownyPokoj.id);
+                        _toSend[2] = Convert.ToByte(1);
+                        _toSend[1] = 8;//code
+                        _toSend[0] = Convert.ToByte(_toSend.Length);
+                        SendDataToALL(_toSend);
+                        //Sendata(socket, _toSend);
+                        break;
+                    }
+                case GameSendCommand.ListAllPlayerInRoom:
+                    {
+                        //na razie sztywniutko (1 pokój)
+                        for (int i = 0; i < Pokoj1.WszyscyGracze.Count; i++)
+                        {
+                            byte[] tempbyte = new byte[2 + Pokoj1.WszyscyGracze[i]._Name.Length];
+                            tempbyte[0] = Convert.ToByte(Pokoj1.WszyscyGracze[i].id);
                             tempbyte[1] = Convert.ToByte(Pokoj1.WszyscyGracze[i]._Name.Length);
                             byte[] stringbyte = Encoding.UTF8.GetBytes(Pokoj1.WszyscyGracze[i]._Name);
                             Array.Copy(stringbyte, 0, tempbyte, 2, stringbyte.Length);
-                            Buffer.BlockCopy(tempbyte, 0, temp2byte, temp2byte.Length, tempbyte.Length);
+                            Buffer.BlockCopy(tempbyte, 0, temp2byte, licznikDlugosci, tempbyte.Length);
+                            licznikDlugosci += tempbyte.Length;
+                        }
+                        _toSend = new byte[3 + licznikDlugosci];
+                        Array.Copy(temp2byte, 0, _toSend, 3, licznikDlugosci);
+                        licznikDlugosci = 0;
+                        _toSend[2] = Convert.ToByte(Pokoj1.WszyscyGracze.Count());
+                        _toSend[1] = 9;//code
+                        _toSend[0] = Convert.ToByte(_toSend.Length);
+                        SendDataToALL(_toSend);
+                        //Sendata(socket, _toSend);
+                        Array.Clear(temp2byte, 0, temp2byte.Length);
+                        break;
                     }
-                    _toSend = new byte[3 + temp2byte.Length];
-                    Array.Copy(temp2byte, 0, _toSend, 3, temp2byte.Length);
-                    _toSend[2] = Convert.ToByte(Pokoj1.WszyscyGracze.Count());
-                    _toSend[1] = 9;//code
-                    _toSend[0] = Convert.ToByte(_toSend.Length);
-                    Sendata(socket, _toSend);
-                    Array.Clear(temp2byte, 0, temp2byte.Length);
-                    break;
-                }
                 case GameSendCommand.ListAllPlayerInRoomToStartGame:
-                {
-                    //na razie sztywniutko (1 pokój) //na razie to samo co w poprzednim case [ZMIENIC!!!]
-                    for (int i = 0; i < Pokoj1.WszyscyGracze.Count; i++)
                     {
-                        byte[] tempbyte = new byte[2 + Pokoj1.WszyscyGracze[i]._Name.Length];
-                        tempbyte[0] = Convert.ToByte(Pokoj1.WszyscyGracze[i].id);
-                        tempbyte[1] = Convert.ToByte(Pokoj1.WszyscyGracze[i]._Name.Length);
-                        Buffer.BlockCopy(tempbyte, 0, temp2byte, temp2byte.Length, tempbyte.Length);
+                        //na razie sztywniutko (1 pokój) //na razie to samo co w poprzednim case [ZMIENIC!!!]
+                        for (int i = 0; i < RozgrywkaPokoj1.WszyscyGracze.Count; i++)
+                        {
+                            byte[] tempbyte = new byte[2 + RozgrywkaPokoj1.WszyscyGracze[i]._Name.Length];
+                            tempbyte[0] = Convert.ToByte(RozgrywkaPokoj1.WszyscyGracze[i].id);
+                            tempbyte[1] = Convert.ToByte(RozgrywkaPokoj1.WszyscyGracze[i]._Name.Length);
+                            byte[] stringbyte = Encoding.UTF8.GetBytes(RozgrywkaPokoj1.WszyscyGracze[i]._Name);
+                            Array.Copy(stringbyte, 0, tempbyte, 2, stringbyte.Length);
+                            Buffer.BlockCopy(tempbyte, 0, temp2byte, licznikDlugosci, tempbyte.Length);
+                            licznikDlugosci += tempbyte.Length;
+                        }
+                        _toSend = new byte[3 + licznikDlugosci];
+                        Array.Copy(temp2byte, 0, _toSend, 3, licznikDlugosci);
+                        licznikDlugosci = 0;
+                        _toSend[2] = Convert.ToByte(RozgrywkaPokoj1.WszyscyGracze.Count());
+                        _toSend[1] = 10;//code
+                        _toSend[0] = Convert.ToByte(_toSend.Length);
+                        //Sendata(socket, _toSend);
+                        SendDataToALL(_toSend);
+                        Array.Clear(temp2byte, 0, temp2byte.Length);
+                        break;
                     }
-                    _toSend = new byte[3 + temp2byte.Length];
-                    Array.Copy(temp2byte, 0, _toSend, 3, temp2byte.Length);
-                    _toSend[2] = Convert.ToByte(Pokoj1.WszyscyGracze.Count());
-                    _toSend[1] = 10;//code
-                    _toSend[0] = Convert.ToByte(_toSend.Length);
-                    SendDataToALL(_toSend);
-                    Array.Clear(temp2byte, 0, temp2byte.Length);
-                    break;
-                }
                 case GameSendCommand.NumberOfCards:
-                {//laduj od razu po starcie gry (po wykonaniu Run)
-                    for (int i = 0; i < Pokoj1.WszyscyGracze.Count; i++)
-                    {
-                        byte[] tempbyte = new byte[2 + Pokoj1.WszyscyGracze[i]._Name.Length];
-                        tempbyte[0] = Convert.ToByte(Pokoj1.WszyscyGracze[i].id);
-                        tempbyte[1] = Convert.ToByte(Pokoj1.WszyscyGracze[i].InHand);
-                        Buffer.BlockCopy(tempbyte, 0, temp2byte, temp2byte.Length, tempbyte.Length);
+                    {//laduj od razu po starcie gry (po wykonaniu Run)
+                        for (int i = 0; i < RozgrywkaPokoj1.WszyscyGracze.Count; i++)
+                        {
+                            byte[] tempbyte = new byte[2 + RozgrywkaPokoj1.WszyscyGracze[i]._Name.Length];
+                            tempbyte[0] = Convert.ToByte(RozgrywkaPokoj1.WszyscyGracze[i].id);
+                            tempbyte[1] = Convert.ToByte(RozgrywkaPokoj1.WszyscyGracze[i].InHand.Count);
+                            Buffer.BlockCopy(tempbyte, 0, temp2byte, temp2byte.Length, tempbyte.Length);
+                        }
+                        _toSend = new byte[3 + temp2byte.Length];
+                        Array.Copy(temp2byte, 0, _toSend, 3, temp2byte.Length);
+                        _toSend[2] = Convert.ToByte(RozgrywkaPokoj1.WszyscyGracze.Count());
+                        _toSend[1] = 1;//code
+                        _toSend[0] = Convert.ToByte(_toSend.Length);
+                        SendDataToALL(_toSend);
+                        Array.Clear(temp2byte, 0, temp2byte.Length);
+                        break;
                     }
-                    _toSend = new byte[3 + temp2byte.Length];
-                    Array.Copy(temp2byte, 0, _toSend, 3, temp2byte.Length);
-                    _toSend[2] = Convert.ToByte(Pokoj1.WszyscyGracze.Count());
-                    _toSend[1] = 1;//code
-                    _toSend[0] = Convert.ToByte(_toSend.Length);
-                    SendDataToALL(_toSend);
-                    Array.Clear(temp2byte, 0, temp2byte.Length);
-                    break;
-                }
                 case GameSendCommand.ListAllPlayerIDs:
-                {
-                    //na razie kopia 9 (1 pokój etc.)
-                    for (int i = 0; i < Pokoj1.WszyscyGracze.Count; i++)
                     {
-                        byte[] tempbyte = new byte[2 + Pokoj1.WszyscyGracze[i]._Name.Length];
-                        tempbyte[0] = Convert.ToByte(Pokoj1.WszyscyGracze[i].id);
-                        tempbyte[1] = Convert.ToByte(Pokoj1.WszyscyGracze[i]._Name.Length);
-                        byte[] stringbyte = Encoding.UTF8.GetBytes(Pokoj1.WszyscyGracze[i]._Name);
-                        Array.Copy(stringbyte, 0, tempbyte, 2, stringbyte.Length);
-                        Buffer.BlockCopy(tempbyte, 0, temp2byte, temp2byte.Length, tempbyte.Length);
+                        //na razie kopia 9 (1 pokój etc.)
+                        for (int i = 0; i < RozgrywkaPokoj1.WszyscyGracze.Count; i++)
+                        {
+                            byte[] tempbyte = new byte[2 + RozgrywkaPokoj1.WszyscyGracze[i]._Name.Length];
+                            tempbyte[0] = Convert.ToByte(RozgrywkaPokoj1.WszyscyGracze[i].id);
+                            tempbyte[1] = Convert.ToByte(RozgrywkaPokoj1.WszyscyGracze[i]._Name.Length);
+                            byte[] stringbyte = Encoding.UTF8.GetBytes(RozgrywkaPokoj1.WszyscyGracze[i]._Name);
+                            Array.Copy(stringbyte, 0, tempbyte, 2, stringbyte.Length);
+                            Buffer.BlockCopy(tempbyte, 0, temp2byte, temp2byte.Length, tempbyte.Length);
+                        }
+                        _toSend = new byte[3 + temp2byte.Length];
+                        Array.Copy(temp2byte, 0, _toSend, 3, temp2byte.Length);
+                        _toSend[2] = Convert.ToByte(RozgrywkaPokoj1.WszyscyGracze.Count());
+                        _toSend[1] = 2;//code
+                        _toSend[0] = Convert.ToByte(_toSend.Length);
+                        SendDataToALL(_toSend);
+                        //Sendata(socket, _toSend); //moze jednak to :D
+                        Array.Clear(temp2byte, 0, temp2byte.Length);
+                        break;
                     }
-                    _toSend = new byte[3 + temp2byte.Length];
-                    Array.Copy(temp2byte, 0, _toSend, 3, temp2byte.Length);
-                    _toSend[2] = Convert.ToByte(Pokoj1.WszyscyGracze.Count());
-                    _toSend[1] = 2;//code
-                    _toSend[0] = Convert.ToByte(_toSend.Length);
-                    Sendata(socket, _toSend);
-                    Array.Clear(temp2byte, 0, temp2byte.Length);
-                    break;
-                }
                 case GameSendCommand.ActivateGetUpCardButton:
-                {
-                    _toSend[1] = 3;//code
-                    _toSend[0] = Convert.ToByte(2);//length
-                    SendDataToALL(_toSend);
-                    break;
-                }
+                    {
+                        _toSend[1] = 3;//code
+                        _toSend[0] = Convert.ToByte(2);//length
+                        SendDataToALL(_toSend);
+                        break;
+                    }
                 case GameSendCommand.DeactivateGetUpCardButton:
-                {
-                    _toSend[1] = 4;//code
-                    _toSend[0] = Convert.ToByte(2);//length
-                    SendDataToALL(_toSend);
-                    break;
-                }
+                    {
+                        _toSend[1] = 4;//code
+                        _toSend[0] = Convert.ToByte(2);//length
+                        SendDataToALL(_toSend);
+                        break;
+                    }
                 //nie jest uberkonieczne
                 case GameSendCommand.DuelWin:
-                {
-                    _toSend[1] = 6;//code
-                    _toSend[0] = Convert.ToByte(2);//length
-                    Sendata(socket, _toSend);//tu dodac socket wygranego
-                    break;
-                }
+                    {
+                        _toSend[1] = 6;//code
+                        _toSend[0] = Convert.ToByte(2);//length
+                        Sendata(socket, _toSend);//tu dodac socket wygranego
+                        break;
+                    }
                 //nie jest uberkonieczne
                 case GameSendCommand.DuelLose:
-                {
-                    _toSend[1] = 7;//code
-                    _toSend[0] = Convert.ToByte(2);//length
-                    Sendata(socket, _toSend);//tu dodac socket przegranego
-                    break;
-                }
+                    {
+                        _toSend[1] = 7;//code
+                        _toSend[0] = Convert.ToByte(2);//length
+                        Sendata(socket, _toSend);//tu dodac socket przegranego
+                        break;
+                    }
                 case GameSendCommand.EndOfGame:
-                {
-                    _toSend[2] = Convert.ToByte(Pokoj1.WszyscyGracze[NowaGra.zwyciezca].id);//id zwyciezcy
-                    _toSend[1] = 11;//code
-                    _toSend[0] = Convert.ToByte(3);//length
-                    break;
-                }
-			}
+                    {
+                        _toSend[2] = Convert.ToByte(RozgrywkaPokoj1.WszyscyGracze[zwyciezca].id);//id zwyciezcy
+                        _toSend[1] = 11;//code
+                        _toSend[0] = Convert.ToByte(3);//length
+                        break;
+                    }
+            }
 
-		}
+        }
 
-		//wyslij do 1 osoby
+        //wyslij do 1 osoby
         void Sendata(Socket socket, byte[] data)
         {
-           socket.BeginSend(data, 0, data.Length, SocketFlags.None, new AsyncCallback(SendCallback), socket);
-           _serverSocket.BeginAccept(new AsyncCallback(AppceptCallback), null);
-           //_serverSocket.BeginAccept(new AsyncCallback(ReceiveCallback), null);
-        }
-		//wyslij do wszystkich graczy
-        void SendDataToALL(byte[] data)
-		{
-			foreach (Gracz client in Pokoj1.WszyscyGracze) {
-				if (client._Socket != _serverSocket) {
-					//Send the message to all users
-					client._Socket.BeginSend (data, 0, data.Length, SocketFlags.None,
-						new AsyncCallback (SendCallback), client._Socket);
-					//byc moze sendcallbackall?
-				}
-			}
-			_serverSocket.BeginAccept (new AsyncCallback (AppceptCallback), null);
+            socket.BeginSend(data, 0, data.Length, SocketFlags.None, new AsyncCallback(SendCallback), socket);
+            _serverSocket.BeginAccept(new AsyncCallback(AppceptCallback), null);
             //_serverSocket.BeginAccept(new AsyncCallback(ReceiveCallback), null);
-		}
+        }
+        //wyslij do wszystkich graczy
+        void SendDataToALL(byte[] data)
+        {
+            foreach (Gracz client in Pokoj1.WszyscyGracze)
+            {
+                if (client._Socket != _serverSocket)
+                {
+                    //Send the message to all users
+                    client._Socket.BeginSend(data, 0, data.Length, SocketFlags.None,
+                        new AsyncCallback(SendCallback), client._Socket);
+                    //byc moze sendcallbackall?
+                }
+            }
+            _serverSocket.BeginAccept(new AsyncCallback(AppceptCallback), null);
+            //_serverSocket.BeginAccept(new AsyncCallback(ReceiveCallback), null);
+        }
         private void SendCallback(IAsyncResult AR)
         {
             Socket socket = (Socket)AR.AsyncState;
@@ -546,5 +528,190 @@ namespace AplikacjaSerwerowa
             }
         }
 
+        #region Logika Gry
+
+        bool isWinner = false;
+        public int zwyciezca;
+        Talia TaliaDoGry = new Talia();
+        Gracze Grajacy = new Gracze();
+        Karta temp = new Karta();
+        int liczbaGraczy;
+        string stanStolu = "";
+        public List<Karta> podTotemem = new List<Karta>();
+        //1. normalny tryb (porownuj wzor) 
+        //2. tryb po wystapieniu karty "kolor" (porownuj po kolorze)
+
+        //zwraca "ID"(np. elementu na liście Grajacy.WszyscyGracze)
+        public int ZwrocIdGracza(int a)
+        {
+            return a;
+        }
+
+        public void Run()
+        {
+            Console.WriteLine("Talia przed zmieszaniem");
+            TaliaDoGry.UtworzTalie();
+            TaliaDoGry.PokazTalie();
+            Console.WriteLine("Talia po zmieszaniu");
+            TaliaDoGry.ZmieszajKarty();
+            TaliaDoGry.PokazTalie();
+
+            Console.WriteLine("Ilu ma być graczy?");
+            liczbaGraczy = Pokoj1.WszyscyGracze.Count();
+            Console.Write(liczbaGraczy + "\n");
+
+            /*
+            for (int i = 0; i < liczbaGraczy; i++)
+            {
+                Grajacy.DodajGracza();
+            }
+            */
+
+            SendCommand(GameSendCommand.NumberOfCards, 0, 0, null, 0);
+
+            //1 faza rozgrywki - rozdanie kart
+            while ((TaliaDoGry.TaliaKart).Any())
+            {
+                for (int j = 0; j < liczbaGraczy; j++)
+                {
+                    for (int i = 0; i < 1; i++) { temp = TaliaDoGry.TaliaKart[i]; }
+                    Grajacy.WszyscyGracze[j].InHand.Add(temp); //dodanie 1 karty z talii
+                    TaliaDoGry.TaliaKart.RemoveRange(0, 1); //usuniecie karty z talii
+                    if (!(TaliaDoGry.TaliaKart).Any()) break;
+                }
+            }
+            for (int i = 1; i <= liczbaGraczy; i++)
+            {
+                Console.WriteLine("Gracz " + i + ":");
+                Grajacy.WszyscyGracze[i - 1].PokazKarty(Grajacy.WszyscyGracze[i - 1].InHand);
+            }
+
+            //2 faza rozgrywki - gra
+            while (!isWinner)
+            {
+                //normalny ruch
+                for (int j = 0; j < liczbaGraczy; j++)
+                {
+                    ZwrocIdGracza(j);
+                    if (Grajacy.WszyscyGracze[j].InHand.Any())
+                    {
+                        //tu wczesniej jakas dzika petla byla :D zwroc uwage, gdyby wysypywalo
+                        temp = Grajacy.WszyscyGracze[j].InHand[0];
+                        if (temp.wzor == 25)
+                        {
+                            Kolory(j);
+                        }
+                        if (temp.wzor == 26)
+                        {
+                            WszyscyNaraz(j);
+                        }
+                        if (temp.wzor == 27)
+                        {
+                            Glosowanie(j);
+                        }
+                        Grajacy.WszyscyGracze[j].OnTable.Add(temp); //wyrzucenie 1 karty na stol
+                        SendCommand(GameSendCommand.PickedCard, j, temp.idKarty, null, 0);
+
+                        //tu 5 sekund na "ruch"
+
+                        Grajacy.SprawdzCzyNaStoleJestSymbol(temp, j);
+                        Grajacy.WszyscyGracze[j].InHand.RemoveRange(0, 1); //usuniecie karty z reki
+                    }
+                    else if (Grajacy.WszyscyGracze[j].OnTable.Any())
+                    {
+                        Grajacy.SprawdzCzyNaStoleJestSymbol(Grajacy.WszyscyGracze[j].OnTable[Grajacy.WszyscyGracze[j].OnTable.Count - 1], j);
+                    }
+
+                    for (int i = 1; i <= liczbaGraczy; i++)
+                    {
+                        stanStolu = "G" + i + ":";
+                        Console.WriteLine(stanStolu);
+                        Grajacy.WszyscyGracze[i - 1].PokazKarty(Grajacy.WszyscyGracze[i - 1].InHand);
+                    }
+
+                    if (!(Grajacy.WszyscyGracze[j].InHand).Any() && !(Grajacy.WszyscyGracze[j].OnTable).Any())
+                    {
+                        isWinner = true;
+                        Console.WriteLine("Zwyciężył gracz: " + Grajacy.WszyscyGracze[j]._Name + ". GRATULUJĘ!");
+                    }
+                    if (isWinner == true)
+                    {
+                        break;
+                    }
+                    //mamy zwyciezce - zatrzymaj petle glowna
+                }
+
+            }
+
+        }
+
+        public void Kolory(int graczWyrzucajacyKolor)
+        {
+            int i = 1;
+            for (int j = 0; j < liczbaGraczy; j++)
+            {
+                i = j + graczWyrzucajacyKolor;
+                if (i >= liczbaGraczy) i = 0;
+                if (Grajacy.WszyscyGracze[i].InHand.Any())
+                {
+
+                    for (int k = 0; k < 1; k++)
+                    {
+                        temp = Grajacy.WszyscyGracze[i].InHand[k];
+                    }
+
+                    if (Grajacy.SprawdzCzyNaStoleJestKolor(temp, i, liczbaGraczy)) break;
+
+                    Grajacy.WszyscyGracze[i].OnTable.Add(temp); //wyrzucenie 1 karty na stol
+                    Grajacy.WszyscyGracze[i].InHand.RemoveRange(0, 1); //usuniecie karty z reki
+                }
+                else if (Grajacy.WszyscyGracze[i].OnTable.Any())
+                {
+                    if (Grajacy.SprawdzCzyNaStoleJestKolor(Grajacy.WszyscyGracze[i].OnTable[Grajacy.WszyscyGracze[i].OnTable.Count - 1], i, liczbaGraczy))
+                        break;
+                }
+                for (int a = 1; a <= liczbaGraczy; a++)
+                {
+                    stanStolu = "G" + a + ":";
+                    Console.WriteLine(stanStolu);
+                    Grajacy.WszyscyGracze[a - 1].PokazKarty(Grajacy.WszyscyGracze[a - 1].InHand);
+                }
+                Console.WriteLine();
+                if (!(Grajacy.WszyscyGracze[i].InHand).Any() && !(Grajacy.WszyscyGracze[i].OnTable).Any())
+                {
+                    isWinner = true;
+                    zwyciezca = i;
+                    Console.WriteLine("Zwyciężył gracz: " + (i + 1) + ". GRATULUJĘ!");
+                }
+                if (isWinner == true)
+                {
+                    break;
+                }
+
+            }
+        }
+
+        public void Glosowanie(int j)
+        {
+
+            Console.WriteLine("Ktory z graczy ma oddac karty pod totem?");
+            podTotemem.AddRange(Grajacy.WszyscyGracze[j].OnTable);
+            Grajacy.WszyscyGracze[j].OnTable.Clear();
+            if (!(Grajacy.WszyscyGracze[j].InHand).Any() && !(Grajacy.WszyscyGracze[j].OnTable).Any())
+            {
+                isWinner = true;
+                Console.WriteLine("Zwyciężył gracz: " + (j + 1) + ". GRATULUJĘ!");
+            }
+
+        }
+
+        public void WszyscyNaraz(int j)
+        {
+            //brak mechanizmu
+            //timer odliczanie do 3 sekund i mozliwosc chwycenia przez kogokolwiek
+        }
+
+
     }
+    #endregion
 }

@@ -33,6 +33,12 @@ namespace AplikacjaSerwerowa
             _Socket = socket;
             _Name = nazwa;
         }
+        public Gracz(int id, Socket socket)
+        {
+            this.id = id;
+            _Socket = socket;
+            _Name = "Bezimienny";
+        }
         public void PokazKarty(List<Karta> ZestawKart)
         {
 
