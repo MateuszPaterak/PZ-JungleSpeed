@@ -68,7 +68,7 @@ namespace Client
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            Network.SendCommand(GameSendCommand.ExitFromRoom); //exit 
+           // Network.SendCommand(GameSendCommand.ExitFromRoom); //exit 
 
             //when window was closed - stop refresh list
             refreshAllListThread.Abort();
@@ -83,7 +83,7 @@ namespace Client
                 Refresh_LVListRoom();
                 Refresh_LVPlayerList();
                 Refresh_LVListPlayerToStart();
-                Thread.Sleep(1000);
+                Thread.Sleep(5000);
             }
         }
 
@@ -141,8 +141,15 @@ namespace Client
 
             foreach (var room in GameRoom.IdListRoom) //add new value
             {
-                string name = GameRoom.NameOfRoom[room];
-                AddItemTo_LVListRoom(new ListViewRecord(room, name));
+                try
+                {
+                    string name = GameRoom.NameOfRoom[room];
+                    AddItemTo_LVListRoom(new ListViewRecord(room, name));
+                }
+                catch (Exception)
+                {
+                    //ignored
+                }
             }
         }
 
@@ -152,8 +159,16 @@ namespace Client
 
             foreach (var room in GameRoom.IdListPlayerInRoom) //add new value
             {
-                string name = GameRoom.NameOfPlayers[room];
-                AddItemTo_LVPlayerList(new ListViewRecord(room, name));
+                try
+                {
+                    string name = GameRoom.NameOfPlayers[room];
+                    AddItemTo_LVPlayerList(new ListViewRecord(room, name));
+                }
+                catch (Exception)
+                {
+                    //ignored
+                }
+                
             }
         }
 
@@ -163,8 +178,16 @@ namespace Client
 
             foreach (var room in GameRoom.IdListPlayerToStartGame) //add new value
             {
-                string name = GameRoom.NameOfPlayers[room];
-                AddItemTo_LVListPlayerToStart(new ListViewRecord(room, name));
+                try
+                {
+                    string name = GameRoom.NameOfPlayers[room];
+                    AddItemTo_LVListPlayerToStart(new ListViewRecord(room, name));
+                }
+                catch (Exception)
+                {
+                    //ignored
+                }
+
             }
         }
 

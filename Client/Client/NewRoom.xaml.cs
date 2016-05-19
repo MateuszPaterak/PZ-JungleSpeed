@@ -14,7 +14,7 @@ namespace Client
     {
         private Thread refreshAllListThread;
         public NewRoom()
-        {
+        {//todo autochecked list when was checked
             InitializeComponent();
 
             BindLvListRoom();//start list view binding
@@ -91,6 +91,7 @@ namespace Client
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            /*
             //when window was closed - stop refresh list
             if (GameRoom.NameRoom != null)
             {
@@ -102,6 +103,7 @@ namespace Client
             refreshAllListThread.Join();
 
             DialogResult = false;
+            */
         }
 
         private void RefreshAllList()
@@ -112,7 +114,7 @@ namespace Client
                 Refresh_LVListRoom();
                 Refresh_LVPlayerList();
                 Refresh_LVListPlayerToStart();
-                Thread.Sleep(1000);
+                Thread.Sleep(5000);
             }
             //RefreshAllList();
         }
@@ -171,8 +173,16 @@ namespace Client
 
             foreach (var room in GameRoom.IdListRoom) //add new value
             {
-                string name = GameRoom.NameOfRoom[room];
-                AddItemTo_LVListRoom(new ListViewRecord(room, name));
+                try
+                {
+                    string name = GameRoom.NameOfRoom[room];
+                    AddItemTo_LVListRoom(new ListViewRecord(room, name));
+                }
+                catch (Exception)
+                {
+                    //ignored
+                }
+                
             }
         }
 
@@ -182,8 +192,16 @@ namespace Client
 
             foreach (var room in GameRoom.IdListPlayerInRoom) //add new value
             {
-                string name = GameRoom.NameOfPlayers[room];
-                AddItemTo_LVPlayerList(new ListViewRecord(room, name));
+                try
+                {
+                    string name = GameRoom.NameOfPlayers[room];
+                    AddItemTo_LVPlayerList(new ListViewRecord(room, name));
+                }
+                catch (Exception)
+                {
+                    //ignored
+                }
+
             }
         }
 
@@ -193,8 +211,16 @@ namespace Client
 
             foreach (var room in GameRoom.IdListPlayerToStartGame) //add new value
             {
-                string name = GameRoom.NameOfPlayers[room];
-                AddItemTo_LVListPlayerToStart(new ListViewRecord(room, name));
+                try
+                {
+                    string name = GameRoom.NameOfPlayers[room];
+                    AddItemTo_LVListPlayerToStart(new ListViewRecord(room, name));
+                }
+                catch (Exception)
+                {
+                    //ignored
+                }
+                
             }
         }
 
