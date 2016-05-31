@@ -9,11 +9,7 @@
         WindowStyle="ToolWindow" Closing="Window_Closing">
     <Grid>
         <ListView x:Name="LVListOfRoom" HorizontalAlignment="Left" Height="383" Margin="10,77,0,0" VerticalAlignment="Top" Width="220">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn/>
-                </GridView>
-            </ListView.View>
+            
         </ListView>
         <ListView x:Name="LVListOfPlayer" HorizontalAlignment="Left" Height="352" Margin="288,108,0,0" VerticalAlignment="Top" Width="233">
             <ListView.View>

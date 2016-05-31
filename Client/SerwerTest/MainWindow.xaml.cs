@@ -122,7 +122,7 @@ namespace SerwerTest
                 _client = serv.EndAcceptTcpClient(asyncResult); //kończy operację połączenia z klientem
                 WriteToTbDisplayNewline("Połączenie z klientem powiodło się."); //wyświetl napis z odpowiedniego wątku 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //WriteToTbDisplayNewline(ex.ToString());
             }

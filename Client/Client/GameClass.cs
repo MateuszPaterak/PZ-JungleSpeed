@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 
 namespace Client
@@ -44,7 +45,7 @@ namespace Client
                 _nameOfPlayer.Add(idPlayer, name);
             }
             
-            if (!_idListPlayer.Contains(idPlayer))
+            if (!_idListPlayer.Exists(item => item == idPlayer))
             {
                 _idListPlayer.Add(idPlayer);
             }
@@ -60,7 +61,7 @@ namespace Client
                 _amountOfPlayerCards.Add(idPlayer, idCard);
             }
             
-            if (!_idListPlayer.Contains(idPlayer))
+            if (!_idListPlayer.Exists(item => item == idPlayer))
             {
                 _idListPlayer.Add(idPlayer);
             }
@@ -136,7 +137,7 @@ namespace Client
 
         public static void AddRoomAndId(int id, string name)
         {
-            if (!IdListRoom.Contains(id))
+            if (!IdListRoom.Exists(item => item == id))
             {
                 IdListRoom.Add(id);
             }
@@ -159,7 +160,7 @@ namespace Client
             {
                 NameOfPlayers.Add(idPlayer, playerName);
             }
-            if (!IdListPlayerInRoom.Contains(idPlayer))
+            if (!IdListPlayerInRoom.Exists(item => item == idPlayer))
             {
                 IdListPlayerInRoom.Add(idPlayer);
             }
@@ -174,7 +175,7 @@ namespace Client
             {
                 NameOfPlayers.Add(idPlayer, playerName);
             }
-            if (!IdListPlayerToStartGame.Contains(idPlayer))
+            if (!IdListPlayerToStartGame.Exists(item => item == idPlayer))
             {
                 IdListPlayerToStartGame.Add(idPlayer);
             }
@@ -223,9 +224,16 @@ namespace Client
 
             if (!Network.ConnectToServer()) return; //check the connection end return when not connected
             Network.BeginReceiveDataFromServer();
-            
-            JoinWindowObj.WindowJoinRoom = new JoinRoom();
-            JoinWindowObj.WindowJoinRoom.ShowDialog();
+
+            try
+            {
+                JoinWindowObj.WindowJoinRoom = new JoinRoom();
+                JoinWindowObj.WindowJoinRoom.ShowDialog();
+            }
+            catch (Exception)
+            {
+                //ignored
+            }
 
             //waiting for control from server
         }

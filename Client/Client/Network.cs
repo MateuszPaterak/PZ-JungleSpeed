@@ -12,6 +12,7 @@ namespace Client
         private static byte[] _byteDataReceive = new byte[1000];
         private static int port = 1000;
         public static string Host = "127.0.0.1";
+        private static bool _runnignReceive;
         
         public static bool ConnectToServer()
         {
@@ -66,8 +67,10 @@ namespace Client
         {
             try
             {
-                //if (MyClient != null && MyClient.Connected)
-                if (MyClient == null || !MyClient.Connected) return;
+                if (MyClient == null) return;
+                if (!MyClient.Connected) return;
+
+                _runnignReceive = true;
 
                 MyClient.Client.BeginReceive(
                         _byteDataReceive,
@@ -79,7 +82,7 @@ namespace Client
             }
             catch (Exception)
             {
-                //MessageBox.Show(ex.ToString());
+                //ignored
             }
         }
 
@@ -87,12 +90,29 @@ namespace Client
         {
             try
             {
-                if (MyClient == null) return;
-                if (!MyClient.Connected) return;
-
+                if (MyClient == null)
+                {
+                    return;
+                }
+                if (!MyClient.Connected)
+                {
+                    try
+                    {
+                        MyClient.Client.EndReceive(arg);
+                    }
+                    catch (Exception)
+                    {
+                        //ignored
+                    }
+                    return;
+                }
+                
                 MyClient.Client.EndReceive(arg);
+
+                if (!_runnignReceive) return; //return when flag is disabled
+
                 ReceiveCommand();
-                _byteDataReceive = new byte[1000];        
+                _byteDataReceive = new byte[1000];
 
                 MyClient.Client.BeginReceive(
                     _byteDataReceive, //wait for new next messages
@@ -100,11 +120,11 @@ namespace Client
                     _byteDataReceive.Length,
                     SocketFlags.None,
                     OnReceiveLoop,
-                    null);
+                    MyClient);
             }
             catch (Exception)
             {
-                //MessageBox.Show("Błąd odbioru danych. "+ex);
+                _runnignReceive = false;
             }
         }
 
@@ -136,6 +156,8 @@ namespace Client
         private static void ReceiveCommand()
         {
             if(_byteDataReceive==null)   return;
+            if(MyClient == null) return;
+            if (!MyClient.Connected) return;
 
             switch (_byteDataReceive[1])
             {
@@ -262,8 +284,6 @@ namespace Client
 
                         GameClass.ClearGameClass();
                         ((MainWindow)Application.Current.MainWindow).CUserControl.Content = new UCMainScreen();
-                        
-                        //todo check stop receive loop
                         break;
                     }
 
@@ -462,17 +482,20 @@ namespace Client
         {
             try
             {
+                if (MyClient == null) return;
+                if (!MyClient.Connected) return;
+
                 MyClient.Client.BeginSend(
                 data,
                 0,
                 data.Length,
                 SocketFlags.None,
                 EndSend,
-                null);
+                MyClient);
             }
             catch (Exception)
             {
-                //MessageBox.Show("Błąd podczas wysyłania: " + ex);
+                //ignored
             }
 }
 
@@ -480,12 +503,15 @@ namespace Client
         {
             try
             {
+                if (MyClient == null) return;
+                if (!MyClient.Connected) return;
+
                 MyClient.Client.EndSend(arg);
                 _byteDataSend = new byte[1000];
             }
             catch (Exception)
             {
-                //MessageBox.Show("Błąd żakończenia wysłania danych. " + ex);
+                //ignored
             }
         }
     }
