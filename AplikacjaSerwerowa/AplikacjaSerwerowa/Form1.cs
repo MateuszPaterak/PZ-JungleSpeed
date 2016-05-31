@@ -382,6 +382,7 @@ namespace AplikacjaSerwerowa
                     }
                 case GameSendCommand.ListAllPlayerInRoomToStartGame:
                     {
+                        licznikDlugosci = 0;
                         //na razie sztywniutko (1 pokój) //na razie to samo co w poprzednim case [ZMIENIC!!!]
                         for (int i = 0; i < RozgrywkaPokoj1.WszyscyGracze.Count; i++)
                         {
@@ -406,15 +407,17 @@ namespace AplikacjaSerwerowa
                     }
                 case GameSendCommand.NumberOfCards:
                     {//laduj od razu po starcie gry (po wykonaniu Run)
+                        licznikDlugosci = 0;
                         for (int i = 0; i < RozgrywkaPokoj1.WszyscyGracze.Count; i++)
                         {
                             byte[] tempbyte = new byte[2 + RozgrywkaPokoj1.WszyscyGracze[i]._Name.Length];
                             tempbyte[0] = Convert.ToByte(RozgrywkaPokoj1.WszyscyGracze[i].id);
                             tempbyte[1] = Convert.ToByte(RozgrywkaPokoj1.WszyscyGracze[i].InHand.Count);
-                            Buffer.BlockCopy(tempbyte, 0, temp2byte, temp2byte.Length, tempbyte.Length);
+                            Buffer.BlockCopy(tempbyte, 0, temp2byte, licznikDlugosci, tempbyte.Length);
+                            licznikDlugosci += tempbyte.Length;
                         }
-                        _toSend = new byte[3 + temp2byte.Length];
-                        Array.Copy(temp2byte, 0, _toSend, 3, temp2byte.Length);
+                        _toSend = new byte[3 + licznikDlugosci];
+                        Array.Copy(temp2byte, 0, _toSend, 3, licznikDlugosci);
                         _toSend[2] = Convert.ToByte(RozgrywkaPokoj1.WszyscyGracze.Count());
                         _toSend[1] = 1;//code
                         _toSend[0] = Convert.ToByte(_toSend.Length);
@@ -424,6 +427,7 @@ namespace AplikacjaSerwerowa
                     }
                 case GameSendCommand.ListAllPlayerIDs:
                     {
+                        licznikDlugosci = 0;
                         //na razie kopia 9 (1 pokój etc.)
                         for (int i = 0; i < RozgrywkaPokoj1.WszyscyGracze.Count; i++)
                         {
@@ -432,10 +436,11 @@ namespace AplikacjaSerwerowa
                             tempbyte[1] = Convert.ToByte(RozgrywkaPokoj1.WszyscyGracze[i]._Name.Length);
                             byte[] stringbyte = Encoding.UTF8.GetBytes(RozgrywkaPokoj1.WszyscyGracze[i]._Name);
                             Array.Copy(stringbyte, 0, tempbyte, 2, stringbyte.Length);
-                            Buffer.BlockCopy(tempbyte, 0, temp2byte, temp2byte.Length, tempbyte.Length);
+                            Buffer.BlockCopy(tempbyte, 0, temp2byte, licznikDlugosci, tempbyte.Length);
+                            licznikDlugosci += tempbyte.Length;
                         }
-                        _toSend = new byte[3 + temp2byte.Length];
-                        Array.Copy(temp2byte, 0, _toSend, 3, temp2byte.Length);
+                        _toSend = new byte[3 + licznikDlugosci];
+                        Array.Copy(temp2byte, 0, _toSend, 3, licznikDlugosci);
                         _toSend[2] = Convert.ToByte(RozgrywkaPokoj1.WszyscyGracze.Count());
                         _toSend[1] = 2;//code
                         _toSend[0] = Convert.ToByte(_toSend.Length);
@@ -533,7 +538,6 @@ namespace AplikacjaSerwerowa
         bool isWinner = false;
         public int zwyciezca;
         Talia TaliaDoGry = new Talia();
-        Gracze Grajacy = new Gracze();
         Karta temp = new Karta();
         int liczbaGraczy;
         string stanStolu = "";
@@ -557,7 +561,7 @@ namespace AplikacjaSerwerowa
             TaliaDoGry.PokazTalie();
 
             Console.WriteLine("Ilu ma być graczy?");
-            liczbaGraczy = Pokoj1.WszyscyGracze.Count();
+            liczbaGraczy = RozgrywkaPokoj1.WszyscyGracze.Count();
             Console.Write(liczbaGraczy + "\n");
 
             /*
@@ -567,23 +571,24 @@ namespace AplikacjaSerwerowa
             }
             */
 
-            SendCommand(GameSendCommand.NumberOfCards, 0, 0, null, 0);
+
 
             //1 faza rozgrywki - rozdanie kart
             while ((TaliaDoGry.TaliaKart).Any())
             {
                 for (int j = 0; j < liczbaGraczy; j++)
                 {
-                    for (int i = 0; i < 1; i++) { temp = TaliaDoGry.TaliaKart[i]; }
-                    Grajacy.WszyscyGracze[j].InHand.Add(temp); //dodanie 1 karty z talii
+                    temp = TaliaDoGry.TaliaKart[0];
+                    RozgrywkaPokoj1.WszyscyGracze[j].InHand.Add(temp); //dodanie 1 karty z talii
                     TaliaDoGry.TaliaKart.RemoveRange(0, 1); //usuniecie karty z talii
                     if (!(TaliaDoGry.TaliaKart).Any()) break;
                 }
             }
+            SendCommand(GameSendCommand.NumberOfCards, 0, 0, null, 0);
             for (int i = 1; i <= liczbaGraczy; i++)
             {
                 Console.WriteLine("Gracz " + i + ":");
-                Grajacy.WszyscyGracze[i - 1].PokazKarty(Grajacy.WszyscyGracze[i - 1].InHand);
+                RozgrywkaPokoj1.WszyscyGracze[i - 1].PokazKarty(RozgrywkaPokoj1.WszyscyGracze[i - 1].InHand);
             }
 
             //2 faza rozgrywki - gra
@@ -593,10 +598,10 @@ namespace AplikacjaSerwerowa
                 for (int j = 0; j < liczbaGraczy; j++)
                 {
                     ZwrocIdGracza(j);
-                    if (Grajacy.WszyscyGracze[j].InHand.Any())
+                    if (RozgrywkaPokoj1.WszyscyGracze[j].InHand.Any())
                     {
                         //tu wczesniej jakas dzika petla byla :D zwroc uwage, gdyby wysypywalo
-                        temp = Grajacy.WszyscyGracze[j].InHand[0];
+                        temp = RozgrywkaPokoj1.WszyscyGracze[j].InHand[0];
                         if (temp.wzor == 25)
                         {
                             Kolory(j);
@@ -609,30 +614,31 @@ namespace AplikacjaSerwerowa
                         {
                             Glosowanie(j);
                         }
-                        Grajacy.WszyscyGracze[j].OnTable.Add(temp); //wyrzucenie 1 karty na stol
+                        RozgrywkaPokoj1.WszyscyGracze[j].OnTable.Add(temp); //wyrzucenie 1 karty na stol
                         SendCommand(GameSendCommand.PickedCard, j, temp.idKarty, null, 0);
 
                         //tu 5 sekund na "ruch"
 
-                        Grajacy.SprawdzCzyNaStoleJestSymbol(temp, j);
-                        Grajacy.WszyscyGracze[j].InHand.RemoveRange(0, 1); //usuniecie karty z reki
+                        RozgrywkaPokoj1.SprawdzCzyNaStoleJestSymbol(temp, j);
+                        RozgrywkaPokoj1.WszyscyGracze[j].InHand.RemoveRange(0, 1); //usuniecie karty z reki
                     }
-                    else if (Grajacy.WszyscyGracze[j].OnTable.Any())
+                    else if (RozgrywkaPokoj1.WszyscyGracze[j].OnTable.Any())
                     {
-                        Grajacy.SprawdzCzyNaStoleJestSymbol(Grajacy.WszyscyGracze[j].OnTable[Grajacy.WszyscyGracze[j].OnTable.Count - 1], j);
+                        RozgrywkaPokoj1.SprawdzCzyNaStoleJestSymbol(RozgrywkaPokoj1.WszyscyGracze[j].OnTable
+                            [RozgrywkaPokoj1.WszyscyGracze[j].OnTable.Count - 1], j);
                     }
 
                     for (int i = 1; i <= liczbaGraczy; i++)
                     {
                         stanStolu = "G" + i + ":";
                         Console.WriteLine(stanStolu);
-                        Grajacy.WszyscyGracze[i - 1].PokazKarty(Grajacy.WszyscyGracze[i - 1].InHand);
+                        RozgrywkaPokoj1.WszyscyGracze[i - 1].PokazKarty(RozgrywkaPokoj1.WszyscyGracze[i - 1].InHand);
                     }
 
-                    if (!(Grajacy.WszyscyGracze[j].InHand).Any() && !(Grajacy.WszyscyGracze[j].OnTable).Any())
+                    if (!(RozgrywkaPokoj1.WszyscyGracze[j].InHand).Any() && !(RozgrywkaPokoj1.WszyscyGracze[j].OnTable).Any())
                     {
                         isWinner = true;
-                        Console.WriteLine("Zwyciężył gracz: " + Grajacy.WszyscyGracze[j]._Name + ". GRATULUJĘ!");
+                        Console.WriteLine("Zwyciężył gracz: " + RozgrywkaPokoj1.WszyscyGracze[j]._Name + ". GRATULUJĘ!");
                     }
                     if (isWinner == true)
                     {
@@ -652,32 +658,33 @@ namespace AplikacjaSerwerowa
             {
                 i = j + graczWyrzucajacyKolor;
                 if (i >= liczbaGraczy) i = 0;
-                if (Grajacy.WszyscyGracze[i].InHand.Any())
+                if (RozgrywkaPokoj1.WszyscyGracze[i].InHand.Any())
                 {
 
                     for (int k = 0; k < 1; k++)
                     {
-                        temp = Grajacy.WszyscyGracze[i].InHand[k];
+                        temp = RozgrywkaPokoj1.WszyscyGracze[i].InHand[k];
                     }
 
-                    if (Grajacy.SprawdzCzyNaStoleJestKolor(temp, i, liczbaGraczy)) break;
+                    if (RozgrywkaPokoj1.SprawdzCzyNaStoleJestKolor(temp, i, liczbaGraczy)) break;
 
-                    Grajacy.WszyscyGracze[i].OnTable.Add(temp); //wyrzucenie 1 karty na stol
-                    Grajacy.WszyscyGracze[i].InHand.RemoveRange(0, 1); //usuniecie karty z reki
+                    RozgrywkaPokoj1.WszyscyGracze[i].OnTable.Add(temp); //wyrzucenie 1 karty na stol
+                    RozgrywkaPokoj1.WszyscyGracze[i].InHand.RemoveRange(0, 1); //usuniecie karty z reki
                 }
-                else if (Grajacy.WszyscyGracze[i].OnTable.Any())
+                else if (RozgrywkaPokoj1.WszyscyGracze[i].OnTable.Any())
                 {
-                    if (Grajacy.SprawdzCzyNaStoleJestKolor(Grajacy.WszyscyGracze[i].OnTable[Grajacy.WszyscyGracze[i].OnTable.Count - 1], i, liczbaGraczy))
+                    if (RozgrywkaPokoj1.SprawdzCzyNaStoleJestKolor(RozgrywkaPokoj1.WszyscyGracze[i].OnTable
+                        [RozgrywkaPokoj1.WszyscyGracze[i].OnTable.Count - 1], i, liczbaGraczy))
                         break;
                 }
                 for (int a = 1; a <= liczbaGraczy; a++)
                 {
                     stanStolu = "G" + a + ":";
                     Console.WriteLine(stanStolu);
-                    Grajacy.WszyscyGracze[a - 1].PokazKarty(Grajacy.WszyscyGracze[a - 1].InHand);
+                    RozgrywkaPokoj1.WszyscyGracze[a - 1].PokazKarty(RozgrywkaPokoj1.WszyscyGracze[a - 1].InHand);
                 }
                 Console.WriteLine();
-                if (!(Grajacy.WszyscyGracze[i].InHand).Any() && !(Grajacy.WszyscyGracze[i].OnTable).Any())
+                if (!(RozgrywkaPokoj1.WszyscyGracze[i].InHand).Any() && !(RozgrywkaPokoj1.WszyscyGracze[i].OnTable).Any())
                 {
                     isWinner = true;
                     zwyciezca = i;
@@ -695,9 +702,9 @@ namespace AplikacjaSerwerowa
         {
 
             Console.WriteLine("Ktory z graczy ma oddac karty pod totem?");
-            podTotemem.AddRange(Grajacy.WszyscyGracze[j].OnTable);
-            Grajacy.WszyscyGracze[j].OnTable.Clear();
-            if (!(Grajacy.WszyscyGracze[j].InHand).Any() && !(Grajacy.WszyscyGracze[j].OnTable).Any())
+            podTotemem.AddRange(RozgrywkaPokoj1.WszyscyGracze[j].OnTable);
+            RozgrywkaPokoj1.WszyscyGracze[j].OnTable.Clear();
+            if (!(RozgrywkaPokoj1.WszyscyGracze[j].InHand).Any() && !(RozgrywkaPokoj1.WszyscyGracze[j].OnTable).Any())
             {
                 isWinner = true;
                 Console.WriteLine("Zwyciężył gracz: " + (j + 1) + ". GRATULUJĘ!");
