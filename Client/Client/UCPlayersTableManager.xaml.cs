@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 
 namespace Client
 {
@@ -20,20 +21,30 @@ namespace Client
         {
             InitializeComponent();
 
-            _imgPlayerCardArray = new Image[10]; //clear
-            _labPlayerName = new Label[10];
+            Application.Current.Dispatcher.BeginInvoke(
+                        DispatcherPriority.Background,
+                        new Action(() =>
+                                {
+                                    _imgPlayerCardArray = new Image[10]; //clear
+                                    _labPlayerName = new Label[10];
 
-            CreatePlayersAndLabel(numbersOfPlayers, "Player");
-            ChangeBackground("palm");
+                                    CreatePlayersAndLabel(numbersOfPlayers, "Player");
+                                    ChangeBackground("palm");
+                                }
+                        ));
         }
 
         public static void ChangePlayerCard(byte nrPlayerOnTable, byte cardNr)
         {
             try
             {
-                _imgPlayerCardArray[nrPlayerOnTable].Source =
-                 new BitmapImage(
-                         new Uri(@"/Pictures/Cards/" + cardNr.ToString() + ".jpg", UriKind.Relative));
+                Application.Current.Dispatcher.BeginInvoke(
+                        DispatcherPriority.Background,
+                        new Action(() =>
+                                _imgPlayerCardArray[nrPlayerOnTable].Source =
+                                new BitmapImage(
+                                new Uri(@"/Pictures/Cards/" + cardNr.ToString() + ".jpg", UriKind.Relative))
+                        ));
             }
             catch (Exception)
             {
@@ -44,8 +55,24 @@ namespace Client
 
         public static void ChangeCardRotation(byte nrPlayerOnTable, int angle)
         {
-            RotateTransform rot = new RotateTransform(angle, _imgPlayerCardArray[nrPlayerOnTable].Width/2, _imgPlayerCardArray[nrPlayerOnTable].Height/2);
-            _imgPlayerCardArray[nrPlayerOnTable].RenderTransform = rot;
+            try
+            {
+                Application.Current.Dispatcher.BeginInvoke(
+                        DispatcherPriority.Background,
+                        new Action(() =>
+                                {
+                                    _imgPlayerCardArray[nrPlayerOnTable].RenderTransform = 
+                                            new RotateTransform(
+                                                angle, 
+                                                _imgPlayerCardArray[nrPlayerOnTable].Width  /2, 
+                                                _imgPlayerCardArray[nrPlayerOnTable].Height /2);
+                                }
+                        ));
+            }
+            catch(Exception)
+            {
+
+            }
         }
 
         public static void ChangeCardRandomRotation(byte nrPlayerOnTable)
@@ -54,10 +81,17 @@ namespace Client
             {
                 int angle = rng.Next(0, 360);
 
-                RotateTransform rot = new RotateTransform(angle, _imgPlayerCardArray[nrPlayerOnTable].Width/2,
-                    _imgPlayerCardArray[nrPlayerOnTable].Height/2);
-
-                _imgPlayerCardArray[nrPlayerOnTable].RenderTransform = rot;
+                Application.Current.Dispatcher.BeginInvoke(
+                        DispatcherPriority.Background,
+                        new Action(() =>
+                        {
+                            _imgPlayerCardArray[nrPlayerOnTable].RenderTransform = 
+                                new RotateTransform(
+                                    angle, 
+                                    _imgPlayerCardArray[nrPlayerOnTable].Width / 2,
+                                    _imgPlayerCardArray[nrPlayerOnTable].Height / 2);
+                        }
+                        ));
             }
             catch (Exception)
             {
@@ -163,11 +197,23 @@ namespace Client
         {
             try
             {
-                _labPlayerName[nrPlayerOnTable].Content = name;
+                Application.Current.Dispatcher.BeginInvoke(
+                        DispatcherPriority.Background,
+                        new Action(() =>
+                        {
+                            _labPlayerName[nrPlayerOnTable].Content = name;
+                        }
+                        ));
             }
             catch (Exception)
             {
-                _labPlayerName[nrPlayerOnTable].Content = "Player";
+                Application.Current.Dispatcher.BeginInvoke(
+                        DispatcherPriority.Background,
+                        new Action(() =>
+                        {
+                            _labPlayerName[nrPlayerOnTable].Content = "Player";
+                        }
+                        ));
             }
         }
 
@@ -188,6 +234,5 @@ namespace Client
             mygrid.Background = ib;
             //GridPlayer.Background = ib;
         }
-
     }
 }
