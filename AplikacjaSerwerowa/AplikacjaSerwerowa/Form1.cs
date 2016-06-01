@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Net;
 using System.Net.Sockets;
+using System.Diagnostics;
 
 namespace AplikacjaSerwerowa
 {
@@ -64,9 +65,8 @@ namespace AplikacjaSerwerowa
         {
             try
             {
-                //dziennik.Items.Add("Serwer włącza się...");
                 _serverSocket.Bind(new IPEndPoint(IPAddress.Any, 1000));
-                _serverSocket.Listen(4); //sprawdz co to dokladnie robi
+                _serverSocket.Listen(10); //sprawdz co to dokladnie robi
                 _serverSocket.BeginAccept(new AsyncCallback(AppceptCallback), null);
                 dziennik.Items.Add("Serwer czeka na graczy :)");
             }
@@ -188,7 +188,8 @@ namespace AplikacjaSerwerowa
                                     //DOIMPLEMENTUJ TO GUNWO
                                 }
                                 //poinformowanie wszystkich graczy
-                                SendCommand(GameSendCommand.PickedCard, 1, 2, null, 0);
+                                //to ponizej chyba nie stad? 2016-06-01
+                                //SendCommand(GameSendCommand.PickedCard, 1, 2, null, 0);
 
                                 break;
                             }
@@ -281,7 +282,15 @@ namespace AplikacjaSerwerowa
                             {
                                 //na sztywno jest
                                 dziennik.Items.Add("Gracz " + nazwaKlienta + " chce utworzyc pokoj");
+                                for (int i = 0; i < Pokoj1.WszyscyGracze.Count; i++)
+                                {
+                                    if (socket == Pokoj1.WszyscyGracze[i]._Socket)
+                                    {
+                                        RozgrywkaPokoj1.WszyscyGracze.Add(Pokoj1.WszyscyGracze[i]);
+                                    }
+                                }
                                 glownyPokoj.nazwa = Encoding.UTF8.GetString(_messageContent);
+
                                 break;
                             }
                         case 63:
@@ -324,7 +333,14 @@ namespace AplikacjaSerwerowa
                 }
 
             }
-            socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, new AsyncCallback(ReceiveCallback), socket);
+            try
+            {
+                socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, new AsyncCallback(ReceiveCallback), socket);
+            }
+            catch (Exception)
+            {
+                //ignored
+            }
         }
 
         public void SendCommand(GameSendCommand command, int idGracza, int idKarty, Socket socket, int idPokoju, byte[] arg = null)
@@ -504,10 +520,38 @@ namespace AplikacjaSerwerowa
             {
                 if (client._Socket != _serverSocket)
                 {
+                    try { 
                     //Send the message to all users
                     client._Socket.BeginSend(data, 0, data.Length, SocketFlags.None,
                         new AsyncCallback(SendCallback), client._Socket);
                     //byc moze sendcallbackall?
+                }
+                    catch (Exception)
+                    {
+                        //2016-06-01-edit
+                    }
+                    }
+            }
+            _serverSocket.BeginAccept(new AsyncCallback(AppceptCallback), null);
+            //_serverSocket.BeginAccept(new AsyncCallback(ReceiveCallback), null);
+        }
+        void SendDataToAllPlayers(byte[] data)
+        {
+            foreach (Gracz client in RozgrywkaPokoj1.WszyscyGracze)
+            {
+                if (client._Socket != _serverSocket)
+                {
+                    try
+                    {
+                        //Send the message to all users
+                        client._Socket.BeginSend(data, 0, data.Length, SocketFlags.None,
+                            new AsyncCallback(SendCallback), client._Socket);
+                        //byc moze sendcallbackall?
+                    }
+                    catch (Exception)
+                    {
+                        //2016-06-01-edit
+                    }
                 }
             }
             _serverSocket.BeginAccept(new AsyncCallback(AppceptCallback), null);
@@ -595,7 +639,7 @@ namespace AplikacjaSerwerowa
             while (!isWinner)
             {
                 //normalny ruch
-                for (int j = 0; j < liczbaGraczy; j++)
+                for (int j = 0; j < RozgrywkaPokoj1.WszyscyGracze.Count; j++)
                 {
                     ZwrocIdGracza(j);
                     if (RozgrywkaPokoj1.WszyscyGracze[j].InHand.Any())
@@ -615,7 +659,29 @@ namespace AplikacjaSerwerowa
                             Glosowanie(j);
                         }
                         RozgrywkaPokoj1.WszyscyGracze[j].OnTable.Add(temp); //wyrzucenie 1 karty na stol
-                        SendCommand(GameSendCommand.PickedCard, j, temp.idKarty, null, 0);
+                        //tego jeszcze nimo 2016-06-01
+                        SendCommand(GameSendCommand.PickedCard, RozgrywkaPokoj1.WszyscyGracze[j].id, temp.idKarty, null, 0);
+
+                        Stopwatch sw = new Stopwatch(); // sw cotructor
+                        sw.Start(); // starts the stopwatch
+                        for (int i = 0; ; i++)
+                        {
+                            if (i % 100000 == 0) // if in 100000th iteration (could be any other large number
+                            // depending on how often you want the time to be checked) 
+                            {
+                                sw.Stop(); // stop the time measurement
+                                if (sw.ElapsedMilliseconds > 10000) // check if desired period of time has elapsed
+                                {
+                                    break; // if more than 5000 milliseconds have passed, stop looping and return
+                                    // to the existing code
+                                }
+                                else
+                                {
+                                    sw.Start(); // if less than 5000 milliseconds have elapsed, continue looping
+                                    // and resume time measurement
+                                }
+                            }
+                        }
 
                         //tu 5 sekund na "ruch"
 
