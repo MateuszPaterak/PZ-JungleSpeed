@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace Client
 {
@@ -69,24 +71,42 @@ namespace Client
 
         public static void ChangeCardAtThePlayer(byte idPlayer, byte idCard)
         {
-            var idPlaceOnTable = _idPlayerToIdPlaceOnTable[idPlayer];
-            PlayersTableManager.ChangePlayerCard(idPlaceOnTable, idCard);
-            PlayersTableManager.ChangeCardRandomRotation(idPlaceOnTable);
+            try
+            {
+                var idPlaceOnTable = _idPlayerToIdPlaceOnTable[idPlayer];
+                PlayersTableManager.ChangePlayerCard(idPlaceOnTable, idCard);
+                PlayersTableManager.ChangeCardRandomRotation(idPlaceOnTable);
+            }
+            catch (Exception)
+            {
+            }
         }
         public static void SetNewPlayerName(byte idPlayer, string name)
         {
-            byte idOnTable = _idPlayerToIdPlaceOnTable[idPlayer];
-            PlayersTableManager.ChangeNamePlayer(idOnTable, name);
+            try
+            {
+                byte idOnTable = _idPlayerToIdPlaceOnTable[idPlayer];
+                PlayersTableManager.ChangeNamePlayer(idOnTable, name);
+            }
+            catch (Exception)
+            {
+            }
         }
         public static void SetAllNewPlayerName()
         {
             foreach (int idPlayer in _idListPlayer)
             {
-                byte id = Convert.ToByte(idPlayer);
-                string name = _nameOfPlayer[id];
-                SetNewPlayerName(id,name);
+                try
+                {
+                    byte id = Convert.ToByte(idPlayer);
+                    string name = _nameOfPlayer[id];
+                    SetNewPlayerName(id, name);
+                }
+                catch(Exception)
+                { }
             }
         }
+        
 
         /// <summary>
         /// To convert IdPlayer to IdPlace at the table.
@@ -97,16 +117,21 @@ namespace Client
             byte count = 0;
             foreach (int  idPlayer in _idListPlayer)
             {
-                byte id = Convert.ToByte(idPlayer);
-                if (_idPlayerToIdPlaceOnTable.ContainsKey(id))
+                try
                 {
-                    _idPlayerToIdPlaceOnTable[id] = count;
+                    byte id = Convert.ToByte(idPlayer);
+                    if (_idPlayerToIdPlaceOnTable.ContainsKey(id))
+                    {
+                        _idPlayerToIdPlaceOnTable[id] = count;
+                    }
+                    else
+                    {
+                        _idPlayerToIdPlaceOnTable.Add(id, count);
+                    }
+                    count++;
                 }
-                else
-                {
-                    _idPlayerToIdPlaceOnTable.Add(id,count);
-                }
-                count++;
+                catch(Exception)
+                { }
             }
         }
     
@@ -205,6 +230,7 @@ namespace Client
         public static void NewRoom()
         {
             ClearGameRoom();
+            JoinWindowObj.WindowJoinRoom = null;
 
             if (!Network.ConnectToServer()) return; //check the connection end return when not connected
             Network.BeginReceiveDataFromServer();
@@ -242,29 +268,71 @@ namespace Client
         {
             try
             {
-                JoinWindowObj.WindowJoinRoom.Close();
+                if (JoinWindowObj.WindowJoinRoom != null)
+                {
+                    if (JoinWindowObj.WindowJoinRoom.Dispatcher.CheckAccess())
+                        JoinWindowObj.WindowJoinRoom.Close();
+                    else
+                        JoinWindowObj.WindowJoinRoom.Dispatcher.Invoke(
+                            JoinWindowObj.WindowJoinRoom.Close);
+
+                    //JoinWindowObj.WindowJoinRoom.Close();
+                }
+
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                //MessageBox.Show(ex.ToString());
                 //ignored
             }
 
-            ((MainWindow)Application.Current.MainWindow).CUserControl.Content 
-                = MyContentClassWindow.ChangeContent(ContNum.PlayersBoard);
+            try
+            {
+            Application.Current.Dispatcher.BeginInvoke(
+                            DispatcherPriority.Background,
+                            new Action(() => ((MainWindow)Application.Current.MainWindow).CUserControl.Content
+                            = MyContentClassWindow.ChangeContent(ContNum.PlayersBoard)));
+            }
+            catch(Exception ex)
+            { }
 
-            ((MainWindow) Application.Current.MainWindow).CUserControl.Content
-                = new PlayersTableManager(playerAmount);
+            try
+            {
+            Application.Current.Dispatcher.BeginInvoke(
+                        DispatcherPriority.Background,
+                        new Action(() => ((MainWindow)Application.Current.MainWindow).CUserControl.Content
+                        = new PlayersTableManager(playerAmount)));
+            }
+            catch (Exception ex)
+            {
+            }
 
-            GameClass.AddIdPlaceIdPlayer(); //create list of idPlace at the table
+            try
+            {
+                Application.Current.Dispatcher.BeginInvoke(
+                            DispatcherPriority.Background,
+                            new Action(GameClass.AddIdPlaceIdPlayer)); //create list of idPlace at the table);
+            }
+            catch (Exception ex)
+            {
+            }
 
-            GameClass.SetAllNewPlayerName();
-
+            
+            try
+            {
+                Application.Current.Dispatcher.BeginInvoke(
+                            DispatcherPriority.Background,
+                            new Action(GameClass.SetAllNewPlayerName));
+            }
+            catch (Exception ex)
+            {
+            }
             //waiting for control at the gamelogic from server
         }
     }
 
     public static class JoinWindowObj
     {
-        public static JoinRoom WindowJoinRoom = new JoinRoom();
+        public static JoinRoom WindowJoinRoom;
     }
 }

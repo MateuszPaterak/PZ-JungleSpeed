@@ -40,8 +40,13 @@ namespace Client
                 return false;
             }
 
-            if (MyClient.Connected) return true; //if exist before and connected
-            
+            try
+            {
+                if (MyClient.Connected) return true; //if exist before and connected
+            }
+            catch(Exception)
+            { }
+
             //not connected before but exist
             portOffset = 0;
             do
@@ -111,7 +116,15 @@ namespace Client
 
                 if (!_runnignReceive) return; //return when flag is disabled
 
-                ReceiveCommand();
+                try
+                {
+                    ReceiveCommand();
+                }
+                catch (Exception)
+                {
+                }
+                
+
                 _byteDataReceive = new byte[1000];
 
                 MyClient.Client.BeginReceive(
@@ -122,8 +135,9 @@ namespace Client
                     OnReceiveLoop,
                     MyClient);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                //MessageBox.Show("Network.OnReceiveLoop :" + ex);
                 _runnignReceive = false;
             }
         }

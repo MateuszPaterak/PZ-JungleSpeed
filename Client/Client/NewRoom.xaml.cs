@@ -23,7 +23,7 @@ namespace Client
             BindLvListPlayerToStart();
             BindLvPlayerList();
 
-            _runningRefresh = true;
+            _runningRefresh = false;
             _refreshAllListThread = new Thread(RefreshAllList);
             _refreshAllListThread.Start();
         }
@@ -98,9 +98,22 @@ namespace Client
                     
                     GameRoom.NameRoom = null;
                     DialogResult = false;
-                    _runningRefresh = false;
-                    _refreshAllListThread.Interrupt();
-                    _refreshAllListThread.Join();
+                    _runningRefresh = true;
+                    Thread.Sleep(1500);
+
+                    try
+                    {
+                        _refreshAllListThread.Interrupt();
+                    }
+                    catch(Exception)
+                    { }
+                    try
+                    {
+                        _refreshAllListThread.Join();
+                    }
+                    catch (Exception)
+                    { }
+                    
                     return;
                 }
                 if (!DialogResult.Value) //new room was not created and started
@@ -118,9 +131,20 @@ namespace Client
 
             try
             {//when window was closed - stop refresh list
-                _runningRefresh = false;
-                _refreshAllListThread.Interrupt();
-                _refreshAllListThread.Join();
+                _runningRefresh = true;
+                try
+                {
+                    _refreshAllListThread.Interrupt();
+                }
+                catch (Exception)
+                { }
+                try
+                {
+                    // _refreshAllListThread.Join();
+                    _refreshAllListThread.Abort();
+                }
+                catch (Exception)
+                { }
             }
             catch (Exception)
             {
@@ -132,8 +156,10 @@ namespace Client
         {
             try
             {
-                while (_runningRefresh)
+                while (!_runningRefresh)
                 {
+                    if (_runningRefresh)
+                        break;
                     Refresh_LVListRoom();
                     Refresh_LVPlayerList();
                     Refresh_LVListPlayerToStart();
@@ -142,7 +168,7 @@ namespace Client
             }
             catch (ThreadInterruptedException)
             {
-                _runningRefresh = false;
+                _runningRefresh = true;
             }
         }
 

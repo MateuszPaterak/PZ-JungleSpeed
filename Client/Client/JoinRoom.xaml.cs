@@ -23,7 +23,7 @@ namespace Client
             BindLvListPlayerToStart();
             BindLvPlayerList();
 
-            _runningRefresh = true;
+            _runningRefresh = false;
             refreshAllListThread = new Thread(RefreshAllList);
             refreshAllListThread.Start();
             
@@ -77,10 +77,25 @@ namespace Client
             //when window was closed - stop refresh list
             try
             {
-                _runningRefresh = false;
+                _runningRefresh = true;
                 Thread.Sleep(1500);
+            }
+            catch (Exception)
+            {
+                //ignored
+            }
+            try
+            {
                 refreshAllListThread.Interrupt(); //todo check closing thread
-                refreshAllListThread.Join();
+            }
+            catch (Exception)
+            {
+                //ignored
+            }
+            try
+            {
+                //refreshAllListThread.Join();
+                refreshAllListThread.Abort();
             }
             catch (Exception)
             {
@@ -92,8 +107,10 @@ namespace Client
         {
             try
             {
-                while (_runningRefresh)
+                while (!_runningRefresh)
                 {
+                    if (_runningRefresh)
+                        break;
                     Refresh_LVListRoom();
                     Refresh_LVPlayerList();
                     Refresh_LVListPlayerToStart();
