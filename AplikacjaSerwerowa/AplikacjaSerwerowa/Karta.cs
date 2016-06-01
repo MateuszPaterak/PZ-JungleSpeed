@@ -8,7 +8,7 @@ namespace AplikacjaSerwerowa
 {
     public class Karta
     {
-		public int idKarty;//doimpl
+		public int idKarty;
         public int wzor;
         public string kolor;
         //img

@@ -79,7 +79,7 @@ namespace AplikacjaSerwerowa
             }
             Console.WriteLine("JEST WALKA! Biją się karty: " + KartyGracz1 + " oraz " + KartyGracz2);
             Console.WriteLine("Jest WALKA! Kto ją wygrywa? Wpisz gracz " + (Gracz1 + 1) + " lub " + (Gracz2 + 1));
-            winner = Convert.ToInt32(Gracz1);
+            winner = Gracz1;
 
 
             if (winner == (Gracz1 + 1))
