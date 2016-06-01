@@ -2,6 +2,7 @@
 using System.Net.Sockets;
 using System.Text;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace Client
 {
@@ -24,7 +25,7 @@ namespace Client
                     try
                     {
                         MyClient = new TcpClient(Host, port+ portOffset);
-                        MessageBox.Show("Nawiązano połączenie z " + Host + " na porcie " + port);
+                        MessageBox.Show("Nawiązano połączenie z " + Host);
                         return true;
                     }
                     catch (Exception)
@@ -54,7 +55,7 @@ namespace Client
                 try
                 {
                     MyClient = new TcpClient(Host, port + portOffset);
-                    MessageBox.Show("Nawiązano połączenie z serwerem " + Host + " na porcie " + port);
+                    MessageBox.Show("Nawiązano połączenie z serwerem " + Host);
                     return true;
                 }
                 catch (Exception)
@@ -210,12 +211,22 @@ namespace Client
                     }
                 case 3:
                     {//enable button GetMyCard
-                        ((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = true;
+                        if (Application.Current.MainWindow.Dispatcher.CheckAccess())
+                            ((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = true;
+                        else
+                            JoinWindowObj.WindowJoinRoom.Dispatcher.Invoke(
+                                 DispatcherPriority.Background,
+                                new Action (()=>((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = true));
                         break;
                     }
                 case 4:
                     {//disable button GetMyCard
-                        ((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = false;
+                        if (Application.Current.MainWindow.Dispatcher.CheckAccess())
+                            ((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = false;
+                        else
+                            JoinWindowObj.WindowJoinRoom.Dispatcher.Invoke(
+                                 DispatcherPriority.Background,
+                                new Action(() => ((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = false));
                         break;
                     }
                 case 5:
@@ -297,7 +308,14 @@ namespace Client
                         MessageBox.Show("Gra zakończona. \nWygrał gracz: "+ winnerName);
 
                         GameClass.ClearGameClass();
-                        ((MainWindow)Application.Current.MainWindow).CUserControl.Content = new UCMainScreen();
+
+                        if (Application.Current.MainWindow.Dispatcher.CheckAccess())
+                            ((MainWindow)Application.Current.MainWindow).CUserControl.Content = new UCMainScreen();
+                        else
+                            JoinWindowObj.WindowJoinRoom.Dispatcher.Invoke(
+                                 DispatcherPriority.Background,
+                                new Action(() => ((MainWindow)Application.Current.MainWindow).CUserControl.Content = new UCMainScreen()));
+                        
                         break;
                     }
 
