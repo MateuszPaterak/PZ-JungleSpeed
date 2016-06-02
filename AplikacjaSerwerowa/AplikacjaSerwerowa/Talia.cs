@@ -14,7 +14,7 @@ namespace AplikacjaSerwerowa
         public void UtworzTalie()
         {
             //100 kart 20x5
-            for (int i = 1; i <=20; i++)
+            for (int i = 1; i <=3; i++)
             {
                 TaliaKart.Add(new Karta() { idKarty = 1 + ((i - 1) * 5), wzor = i, kolor = "czarny" });
                 TaliaKart.Add(new Karta() { idKarty = 2 + ((i - 1) * 5), wzor = i, kolor = "biały" });
@@ -23,10 +23,18 @@ namespace AplikacjaSerwerowa
                 TaliaKart.Add(new Karta() { idKarty = 5 + ((i - 1) * 5), wzor = i, kolor = "niebieski" });
             }
 
-            //96 kart "normalnych", 24 rozne wzory
-            //TaliaKart.Add (new Karta () { wzor = 25, kolor = "specjalny"}); //kolor 2x
-            //TaliaKart.Add (new Karta () { wzor = 26, kolor = "specjalny"}); //wszyscy naraz 3x
-            //TaliaKart.Add (new Karta () { wzor = 27, kolor = "specjalny"}); //glosowanie 3x
+            //8 kart specjalnych
+            //kolor 2x
+            //TaliaKart.Add(new Karta() { idKarty = 101, wzor = 21, kolor = "specjalny" });
+            //TaliaKart.Add(new Karta() { idKarty = 102, wzor = 21, kolor = "specjalny" });
+            //wszyscy naraz 3x
+            //TaliaKart.Add(new Karta() { idKarty = 103, wzor = 22, kolor = "specjalny" });
+            //TaliaKart.Add(new Karta() { idKarty = 104, wzor = 22, kolor = "specjalny" });
+            //TaliaKart.Add(new Karta() { idKarty = 105, wzor = 22, kolor = "specjalny" });
+            //glosowanie 3x
+            //TaliaKart.Add(new Karta() { idKarty = 106, wzor = 23, kolor = "specjalny" });
+            //TaliaKart.Add(new Karta() { idKarty = 107, wzor = 23, kolor = "specjalny" });
+            //TaliaKart.Add(new Karta() { idKarty = 108, wzor = 23, kolor = "specjalny" });
         }
 
         public void PokazTalie()

@@ -12,13 +12,6 @@ namespace AplikacjaSerwerowa
         int winner;
         string KartyGracz1 = "";
         string KartyGracz2 = "";
-        //Random r = new Random();
-
-        /*
-        public void DodajGracza()
-        {
-            WszyscyGracze.Add(new Gracz(r.Next(0,50)) { });
-        }*/
 
         public void SprawdzCzyNaStoleJestSymbol(Karta Karta1, int IDGracza)
         {
@@ -78,7 +71,7 @@ namespace AplikacjaSerwerowa
                 KartyGracz2 = "null";
             }
             Console.WriteLine("JEST WALKA! Biją się karty: " + KartyGracz1 + " oraz " + KartyGracz2);
-            Console.WriteLine("Jest WALKA! Kto ją wygrywa? Wpisz gracz " + (Gracz1 + 1) + " lub " + (Gracz2 + 1));
+            //Console.WriteLine("Jest WALKA! Kto ją wygrywa? Wpisz gracz " + (Gracz1 + 1) + " lub " + (Gracz2 + 1));
             winner = Gracz1;
 
 

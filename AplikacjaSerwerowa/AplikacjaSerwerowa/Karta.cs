@@ -11,6 +11,5 @@ namespace AplikacjaSerwerowa
 		public int idKarty;
         public int wzor;
         public string kolor;
-        //img
     }
 }

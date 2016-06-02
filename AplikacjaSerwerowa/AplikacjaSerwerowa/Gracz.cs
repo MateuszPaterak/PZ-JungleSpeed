@@ -26,7 +26,6 @@ namespace AplikacjaSerwerowa
                 _Socket = socket;
                 _Name = "Bezimienny";
         }
-        //wkrótce
         public Gracz(int id, Socket socket, string nazwa)
         {
             this.id = id;
@@ -41,7 +40,6 @@ namespace AplikacjaSerwerowa
         }
         public void PokazKarty(List<Karta> ZestawKart)
         {
-
             ZestawKart.ForEach(delegate(Karta abc)
             {
                 Console.WriteLine(abc.wzor + " " + abc.kolor);

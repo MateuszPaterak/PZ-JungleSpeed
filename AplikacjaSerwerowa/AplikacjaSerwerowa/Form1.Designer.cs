@@ -34,7 +34,6 @@
             this.listaGraczy = new System.Windows.Forms.ListBox();
             this.label3 = new System.Windows.Forms.Label();
             this.dziennik = new System.Windows.Forms.ListBox();
-            this.button1 = new System.Windows.Forms.Button();
             this.listBox1 = new System.Windows.Forms.ListBox();
             this.label4 = new System.Windows.Forms.Label();
             this.SuspendLayout();
@@ -91,16 +90,6 @@
             this.dziennik.Size = new System.Drawing.Size(668, 251);
             this.dziennik.TabIndex = 6;
             // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(605, 113);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 7;
-            this.button1.Text = "Testuj";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
             // listBox1
             // 
             this.listBox1.FormattingEnabled = true;
@@ -125,7 +114,6 @@
             this.ClientSize = new System.Drawing.Size(695, 400);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.listBox1);
-            this.Controls.Add(this.button1);
             this.Controls.Add(this.dziennik);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.listaGraczy);
@@ -147,7 +135,6 @@
         private System.Windows.Forms.ListBox listaGraczy;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ListBox dziennik;
-        private System.Windows.Forms.Button button1;
         private System.Windows.Forms.ListBox listBox1;
         private System.Windows.Forms.Label label4;
     }

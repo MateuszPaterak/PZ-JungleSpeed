@@ -49,6 +49,14 @@ namespace AplikacjaSerwerowa
         public Socket _serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         Random r = new Random();
 
+        #region Tymczasowo (potem lepiej się rozwiąże)
+        bool isCardPickUpRequest = false;
+        bool isTakeTotemRequest = false;
+        bool duelIsOn = false;
+        int playerHavingTurn;
+        int playerTakingTotem;
+        int roomMaxID = 0;
+        #endregion
 
         #region Rzeczy do zmienienia
         public static Pokoj glownyPokoj = new Pokoj(0, "Glowny pokoj");
@@ -66,7 +74,7 @@ namespace AplikacjaSerwerowa
             try
             {
                 _serverSocket.Bind(new IPEndPoint(IPAddress.Any, 1000));
-                _serverSocket.Listen(10); //sprawdz co to dokladnie robi
+                _serverSocket.Listen(10);
                 _serverSocket.BeginAccept(new AsyncCallback(AppceptCallback), null);
                 dziennik.Items.Add("Serwer czeka na graczy :)");
             }
@@ -80,12 +88,10 @@ namespace AplikacjaSerwerowa
         {
             Socket socket = _serverSocket.EndAccept(ar);
 
-            //zrobic tak, zeby wartosci losowe nie mogly sie powtarzac
-            Pokoj1.WszyscyGracze.Add(new Gracz(r.Next(0,50),socket));
+            Pokoj1.WszyscyGracze.Add(new Gracz(roomMaxID,socket));
+            roomMaxID++;
             listaGraczy.Items.Add(socket.RemoteEndPoint.ToString());
-
             dziennik.Items.Add("Hura, dołączył kolejny gracz! Obecna liczba graczy to: " + Pokoj1.WszyscyGracze.Count.ToString());
-            //dziennik.Items.Add"Klient połączony...";
             socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, new AsyncCallback(ReceiveCallback), socket);
             _serverSocket.BeginAccept(new AsyncCallback(AppceptCallback), null);
         }
@@ -104,6 +110,7 @@ namespace AplikacjaSerwerowa
                 }
                 catch (Exception)
                 {
+                    //jesli cos nie pyklo to wywal z Pokoj1 (co z RozgrywkaPokoj1?)
                     for (int i = 0; i < Pokoj1.WszyscyGracze.Count; i++)
                     {
                         if (Pokoj1.WszyscyGracze[i]._Socket.RemoteEndPoint.ToString().Equals(socket.RemoteEndPoint.ToString()))
@@ -111,22 +118,19 @@ namespace AplikacjaSerwerowa
                             Pokoj1.WszyscyGracze.RemoveAt(i);
                             listaGraczy.Items.RemoveAt(i);
                             dziennik.Items.Add("Gracz niestety opuścił serwer. Obecna liczba graczy to: " + Pokoj1.WszyscyGracze.Count.ToString());
-
                         }
                     }
                     return;
                 }
                 if (received != 0)
                 {
-                    //Encoding.UTF8.GetBytes
-
                     dlugoscPakietu = _buffer[0];
                     kodWiadomosci = _buffer[1];
                     if ((dlugoscPakietu - 2) > 0)
                     {
                         _messageContent = new byte[dlugoscPakietu - 2];
                         for (int i = 0; i < dlugoscPakietu - 2; i++)
-                        {//slice etc.?
+                        {
                             _messageContent[i] = _buffer[2 + i];
                         }
                     }
@@ -142,10 +146,12 @@ namespace AplikacjaSerwerowa
                                 {
                                     if (socket == RozgrywkaPokoj1.WszyscyGracze[i]._Socket)
                                     {
-                                        RozgrywkaPokoj1.SprawdzCzyNaStoleJestSymbol(RozgrywkaPokoj1.WszyscyGracze[i].OnTable
-                                            [RozgrywkaPokoj1.WszyscyGracze[i].OnTable.Count - 1], RozgrywkaPokoj1.WszyscyGracze[i].id);
+                                        isTakeTotemRequest = true;
+                                        playerTakingTotem = RozgrywkaPokoj1.WszyscyGracze[i].id;
+                                        //stara impl.
+                                        //RozgrywkaPokoj1.SprawdzCzyNaStoleJestSymbol(RozgrywkaPokoj1.WszyscyGracze[i].OnTable
+                                        //    [RozgrywkaPokoj1.WszyscyGracze[i].OnTable.Count - 1], RozgrywkaPokoj1.WszyscyGracze[i].id);
                                     }
-                                    //SendCommand 2x (do zwyciezcy i do przegranego)
                                 }
 
                                 break;
@@ -165,14 +171,13 @@ namespace AplikacjaSerwerowa
                                 dziennik.Items.Add("Gracz " + nazwaKlienta + " obrócił kartę");
                                 for (int i = 0; i < RozgrywkaPokoj1.WszyscyGracze.Count; i++)
                                 {
-                                    if (socket == RozgrywkaPokoj1.WszyscyGracze[i]._Socket)
+                                    if (socket.RemoteEndPoint.ToString().Equals(RozgrywkaPokoj1.WszyscyGracze[i]._Socket.RemoteEndPoint.ToString())
+                                        && playerHavingTurn == RozgrywkaPokoj1.WszyscyGracze[i].id)
                                     {
-                                        //kod na odwrocenie (przerobic lekko logike)
+                                        isCardPickUpRequest = true;
                                     }
+                                    //2016-06-01 - zrob implementacje blokowania przycisku
                                 }
-                                //poinformowanie wszystkich graczy
-                                SendCommand(GameSendCommand.PickedCard, 1, 2, null, 0);
-
                                 break;
                             }
                         //DOIMPLEMENTOWAĆ PÓŹNIEJ
@@ -284,7 +289,7 @@ namespace AplikacjaSerwerowa
                                 dziennik.Items.Add("Gracz " + nazwaKlienta + " chce utworzyc pokoj");
                                 for (int i = 0; i < Pokoj1.WszyscyGracze.Count; i++)
                                 {
-                                    if (socket == Pokoj1.WszyscyGracze[i]._Socket)
+                                    if (socket.RemoteEndPoint.ToString().Equals(Pokoj1.WszyscyGracze[i]._Socket.RemoteEndPoint.ToString()))
                                     {
                                         RozgrywkaPokoj1.WszyscyGracze.Add(Pokoj1.WszyscyGracze[i]);
                                     }
@@ -500,6 +505,7 @@ namespace AplikacjaSerwerowa
                         _toSend[2] = Convert.ToByte(RozgrywkaPokoj1.WszyscyGracze[zwyciezca].id);//id zwyciezcy
                         _toSend[1] = 11;//code
                         _toSend[0] = Convert.ToByte(3);//length
+                        SendDataToALL(_toSend);
                         break;
                     }
             }
@@ -562,20 +568,6 @@ namespace AplikacjaSerwerowa
             Socket socket = (Socket)AR.AsyncState;
             socket.EndSend(AR);
         }
-        private void button1_Click(object sender, EventArgs e)
-        {
-            for (int i = 0; i < listaGraczy.SelectedItems.Count; i++)
-            {
-                string t = listaGraczy.SelectedItems[i].ToString();
-                for (int j = 0; j < Pokoj1.WszyscyGracze.Count; j++)
-                {
-                    //if (__ClientSockets[j]._Socket.Connected && __ClientSockets[j]._Name.Equals("@"+t))
-                    {
-                        //potrzebne to?
-                    }
-                }
-            }
-        }
 
         #region Logika Gry
 
@@ -588,12 +580,6 @@ namespace AplikacjaSerwerowa
         public List<Karta> podTotemem = new List<Karta>();
         //1. normalny tryb (porownuj wzor) 
         //2. tryb po wystapieniu karty "kolor" (porownuj po kolorze)
-
-        //zwraca "ID"(np. elementu na liście Grajacy.WszyscyGracze)
-        public int ZwrocIdGracza(int a)
-        {
-            return a;
-        }
 
         public void Run()
         {
@@ -608,23 +594,16 @@ namespace AplikacjaSerwerowa
             liczbaGraczy = RozgrywkaPokoj1.WszyscyGracze.Count();
             Console.Write(liczbaGraczy + "\n");
 
-            /*
-            for (int i = 0; i < liczbaGraczy; i++)
-            {
-                Grajacy.DodajGracza();
-            }
-            */
-
-
-
             //1 faza rozgrywki - rozdanie kart
             while ((TaliaDoGry.TaliaKart).Any())
             {
                 for (int j = 0; j < liczbaGraczy; j++)
                 {
                     temp = TaliaDoGry.TaliaKart[0];
+                    if(RozgrywkaPokoj1.WszyscyGracze[j]._Name!="GM"){
                     RozgrywkaPokoj1.WszyscyGracze[j].InHand.Add(temp); //dodanie 1 karty z talii
                     TaliaDoGry.TaliaKart.RemoveRange(0, 1); //usuniecie karty z talii
+                    }
                     if (!(TaliaDoGry.TaliaKart).Any()) break;
                 }
             }
@@ -636,62 +615,44 @@ namespace AplikacjaSerwerowa
             }
 
             //2 faza rozgrywki - gra
-            while (!isWinner)
-            {
-                //normalny ruch
+            while (!isWinner) {
                 for (int j = 0; j < RozgrywkaPokoj1.WszyscyGracze.Count; j++)
                 {
-                    ZwrocIdGracza(j);
+                    playerHavingTurn = RozgrywkaPokoj1.WszyscyGracze[j].id;
+                    Pojedynek();
+                    if (RozgrywkaPokoj1.WszyscyGracze[j]._Name == "GM") j++;
+                    if (!isCardPickUpRequest) j = j - 1;
+                    else{
+
+                    //ruch 1 gracza - jeśli gracz ma jakąś kartę w dłoni, to podnies ją
                     if (RozgrywkaPokoj1.WszyscyGracze[j].InHand.Any())
                     {
-                        //tu wczesniej jakas dzika petla byla :D zwroc uwage, gdyby wysypywalo
                         temp = RozgrywkaPokoj1.WszyscyGracze[j].InHand[0];
-                        if (temp.wzor == 25)
+                        if (temp.wzor == 21)
                         {
                             Kolory(j);
                         }
-                        if (temp.wzor == 26)
+                        if (temp.wzor == 22)
                         {
                             WszyscyNaraz(j);
                         }
-                        if (temp.wzor == 27)
+                        if (temp.wzor == 23)
                         {
                             Glosowanie(j);
                         }
                         RozgrywkaPokoj1.WszyscyGracze[j].OnTable.Add(temp); //wyrzucenie 1 karty na stol
-                        //tego jeszcze nimo 2016-06-01
+                        RozgrywkaPokoj1.WszyscyGracze[j].InHand.RemoveRange(0, 1); //usuniecie karty z reki
+                        
                         SendCommand(GameSendCommand.PickedCard, RozgrywkaPokoj1.WszyscyGracze[j].id, temp.idKarty, null, 0);
 
-                        Stopwatch sw = new Stopwatch(); // sw cotructor
-                        sw.Start(); // starts the stopwatch
-                        for (int i = 0; ; i++)
-                        {
-                            if (i % 100000 == 0) // if in 100000th iteration (could be any other large number
-                            // depending on how often you want the time to be checked) 
-                            {
-                                sw.Stop(); // stop the time measurement
-                                if (sw.ElapsedMilliseconds > 10000) // check if desired period of time has elapsed
-                                {
-                                    break; // if more than 5000 milliseconds have passed, stop looping and return
-                                    // to the existing code
-                                }
-                                else
-                                {
-                                    sw.Start(); // if less than 5000 milliseconds have elapsed, continue looping
-                                    // and resume time measurement
-                                }
-                            }
-                        }
+                        Pojedynek();
 
-                        //tu 5 sekund na "ruch"
-
-                        RozgrywkaPokoj1.SprawdzCzyNaStoleJestSymbol(temp, j);
-                        RozgrywkaPokoj1.WszyscyGracze[j].InHand.RemoveRange(0, 1); //usuniecie karty z reki
                     }
                     else if (RozgrywkaPokoj1.WszyscyGracze[j].OnTable.Any())
                     {
-                        RozgrywkaPokoj1.SprawdzCzyNaStoleJestSymbol(RozgrywkaPokoj1.WszyscyGracze[j].OnTable
-                            [RozgrywkaPokoj1.WszyscyGracze[j].OnTable.Count - 1], j);
+                        Pojedynek();
+                        //RozgrywkaPokoj1.SprawdzCzyNaStoleJestSymbol(RozgrywkaPokoj1.WszyscyGracze[j].OnTable
+                            //[RozgrywkaPokoj1.WszyscyGracze[j].OnTable.Count - 1], j);
                     }
 
                     for (int i = 1; i <= liczbaGraczy; i++)
@@ -701,20 +662,55 @@ namespace AplikacjaSerwerowa
                         RozgrywkaPokoj1.WszyscyGracze[i - 1].PokazKarty(RozgrywkaPokoj1.WszyscyGracze[i - 1].InHand);
                     }
 
-                    if (!(RozgrywkaPokoj1.WszyscyGracze[j].InHand).Any() && !(RozgrywkaPokoj1.WszyscyGracze[j].OnTable).Any())
+                //warunek zwycięski [blokada z j >= 0 tymczasowo :D]
+                    if (j >= 0 && !(RozgrywkaPokoj1.WszyscyGracze[j].InHand).Any() && !(RozgrywkaPokoj1.WszyscyGracze[j].OnTable).Any())
                     {
                         isWinner = true;
-                        Console.WriteLine("Zwyciężył gracz: " + RozgrywkaPokoj1.WszyscyGracze[j]._Name + ". GRATULUJĘ!");
+                        zwyciezca = RozgrywkaPokoj1.WszyscyGracze[j].id;
+                        Console.WriteLine("Zwyciężył gracz: " + RozgrywkaPokoj1.WszyscyGracze[j].id + ". GRATULUJĘ!");
+                        SendCommand(GameSendCommand.EndOfGame,0,0,null,0,null);
                     }
                     if (isWinner == true)
                     {
                         break;
                     }
                     //mamy zwyciezce - zatrzymaj petle glowna
+                    isCardPickUpRequest = false;
+                    }
                 }
-
             }
+        }
 
+        private void Pojedynek()
+        {
+            duelIsOn = true;
+            Stopwatch sw = new Stopwatch(); // sw cotructor
+            sw.Start(); // starts the stopwatch
+            for (int i = 0; ; i++)
+            {
+                if (i % 100000 == 0) // if in 100000th iteration (could be any other large number
+                // depending on how often you want the time to be checked) 
+                {
+                    sw.Stop(); // stop the time measurement
+                    if (sw.ElapsedMilliseconds > 5000) // check if desired period of time has elapsed
+                    {
+                        break; // if more than 5000 milliseconds have passed, stop looping and return
+                        // to the existing code
+                    }
+                    else
+                    {
+                        sw.Start(); // if less than 5000 milliseconds have elapsed, continue looping
+                        // and resume time measurement
+                        if (isTakeTotemRequest) { 
+                            RozgrywkaPokoj1.SprawdzCzyNaStoleJestSymbol(temp, playerTakingTotem);
+                            duelIsOn = false;
+                            isTakeTotemRequest = false;
+                        }
+                    }
+                    sw.Stop();
+                    break;
+                }
+            }
         }
 
         public void Kolory(int graczWyrzucajacyKolor)
@@ -760,7 +756,6 @@ namespace AplikacjaSerwerowa
                 {
                     break;
                 }
-
             }
         }
 
