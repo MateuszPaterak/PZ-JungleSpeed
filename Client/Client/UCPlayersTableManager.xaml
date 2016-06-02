@@ -7,7 +7,7 @@
              mc:Ignorable="d" Height="500" Width="500">
     <Grid x:Name="GridPlayer" Margin="0,0,0,0" Height="500" Width="500" HorizontalAlignment="Left" VerticalAlignment="Top">
         <Grid.Background>
-            <ImageBrush x:Name="ImgBackground" ImageSource="Pictures/bokeh.jpg"/>
+            <ImageBrush x:Name="ImgBackground" ImageSource="Pictures/wood500_2.png"/>
         </Grid.Background>
         <Image x:Name="ImgTotem" Source="/Pictures/totem.png" HorizontalAlignment="Center" Height="150" Margin="0,0,0,0" VerticalAlignment="Center" Width="Auto" />
     </Grid>

@@ -15,7 +15,7 @@ namespace Client
         private static Image[] _imgPlayerCardArray = new Image[10];
         private static Label[] _labPlayerName = new Label[10];
         private static Random rng = new Random();
-        public enum NameOfBackground { Palm, Wood, Bokeh }
+        public enum NameOfBackground { Palm, Wood, Bokeh, Wood500 }
 
         public PlayersTableManager(byte numbersOfPlayers)
         {
@@ -29,7 +29,7 @@ namespace Client
                                     _labPlayerName = new Label[10];
 
                                     CreatePlayersAndLabel(numbersOfPlayers, "Player");
-                                    ChangeBackground("palm");
+                                    ChangeBackground("wood500");
                                 }
                         ));
         }
@@ -225,7 +225,7 @@ namespace Client
                 Width = 100,
                 Height = 100,
                 Source = new BitmapImage(
-                    new Uri(@"/Pictures/" + name + ".png", UriKind.Relative)),
+                    new Uri(@"/Pictures/" + name + ".jpg", UriKind.Relative)),
             };
             ImageBrush ib = new ImageBrush();
             ib.ImageSource = new BitmapImage(new Uri("/Pictures/Cards/1.jpg", UriKind.Relative));
