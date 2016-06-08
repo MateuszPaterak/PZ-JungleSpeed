@@ -5,12 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Client"
         mc:Ignorable="d"
-        Title="Wojna o totem" Height="650" Width="700" Closing="Window_Closing">
+        Title="Wojna o totem" Height="650" Width="700" Closing="Window_Closing" SizeChanged="Window_SizeChanged"
+        MinHeight="650" MinWidth="700">
     <Grid>
         <Grid.Background>
             <ImageBrush ImageSource="Pictures/bokeh.jpg"/>
         </Grid.Background>
-        <Menu x:Name="Menu" HorizontalAlignment="Left" Height="25" VerticalAlignment="Top" Width="900">
+        <Menu x:Name="Menu" HorizontalAlignment="Left" Height="25" VerticalAlignment="Top" Width="Auto">
             <MenuItem Header="Rozgrywka">
                 <MenuItem Header="Adres IP serwera" Click="ConfigIpServer"></MenuItem>
                 <MenuItem Header="Utwórz nowy pokój" Click="NewRoom"></MenuItem>
@@ -20,9 +21,9 @@
             </MenuItem>
         </Menu>
         <ContentControl x:Name="CUserControl" Grid.Row="0" Margin="10,35,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="500" Width="500"/>
-        <Button x:Name="BtGetUpCard" Content="Podnieś &#xD;&#xA;kartę" HorizontalAlignment="Left" Margin="535,48,0,0" VerticalAlignment="Top" Width="80" Height="50" Click="BtGetUpCard_Click"/>
-        <Button x:Name="BtGetTotem" Content="Weź&#xD;&#xA;totem" HorizontalAlignment="Left" Margin="535,130,0,0" VerticalAlignment="Top" Width="80" Height="50" Click="BtGetTotem_Click"/>
-        <Button x:Name="BtOutOfGameplay" Content="Opuść&#xD;&#xA;rozgrywkę" HorizontalAlignment="Left" Margin="535,275,0,0" VerticalAlignment="Top" Width="80" Height="50" Click="BtOutOfGameplay_Click"/>
+        <Button x:Name="BtGetUpCard" Content="Podnieś &#xD;&#xA;kartę" HorizontalAlignment="Right" Margin="0,48,75,0" VerticalAlignment="Top" Width="80" Height="50" Click="BtGetUpCard_Click"/>
+        <Button x:Name="BtGetTotem" Content="Weź&#xD;&#xA;totem" HorizontalAlignment="Right" Margin="0,130,75,0" VerticalAlignment="Top" Width="80" Height="50" Click="BtGetTotem_Click"/>
+        <Button x:Name="BtOutOfGameplay" Content="Opuść&#xD;&#xA;rozgrywkę" HorizontalAlignment="Right" Margin="0,275,75,0" VerticalAlignment="Top" Width="80" Height="50" Click="BtOutOfGameplay_Click"/>
         
     </Grid>
 </Window>

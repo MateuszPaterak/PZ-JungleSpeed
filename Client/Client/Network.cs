@@ -138,8 +138,8 @@ namespace Client
             }
             catch (Exception ex)
             {
-                //MessageBox.Show("Network.OnReceiveLoop :" + ex);
-                _runnignReceive = false;
+             //   MessageBox.Show("Network.OnReceiveLoop :" + ex);
+                //_runnignReceive = false;
             }
         }
 
