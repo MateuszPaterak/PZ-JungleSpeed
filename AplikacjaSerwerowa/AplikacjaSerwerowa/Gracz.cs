@@ -13,9 +13,11 @@ namespace AplikacjaSerwerowa
         public string _Name;
         public int id;
         public bool isActive = false;
+        public bool buttonActive = true;
         public List<Karta> InHand = new List<Karta>();
         public List<Karta> OnTable = new List<Karta>();
         public Karta OstatniaKarta = new Karta();
+
 
         public Gracz(int id)
         {

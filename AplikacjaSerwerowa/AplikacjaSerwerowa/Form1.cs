@@ -137,7 +137,7 @@ namespace AplikacjaSerwerowa
 
                     switch (kodWiadomosci)
                     {
-                        //DOIMPLEMENTOWAĆ
+                        //chyba good 2016-06-08
                         //gracz żąda podniesienia totemu
                         case 50:
                             {
@@ -148,17 +148,12 @@ namespace AplikacjaSerwerowa
                                     {
                                         isTakeTotemRequest = true;
                                         playerTakingTotem = RozgrywkaPokoj1.WszyscyGracze[i].id;
-                                        //stara impl.
-                                        //RozgrywkaPokoj1.SprawdzCzyNaStoleJestSymbol(RozgrywkaPokoj1.WszyscyGracze[i].OnTable
-                                        //    [RozgrywkaPokoj1.WszyscyGracze[i].OnTable.Count - 1], RozgrywkaPokoj1.WszyscyGracze[i].id);
                                     }
                                 }
 
                                 break;
                             }
-                        //DOIMPLEMENTOWAĆ PÓŹNIEJ
-                        //gracz wybiera papier, kamień lub nożyce
-                        //zawartość wiadomości P:[1],K:[2],N:[3];
+                        //gracz wybiera papier, kamień lub nożyce //zawartość wiadomości P:[1],K:[2],N:[3];
                         case 51:
                             {
                                 dziennik.Items.Add("Gracz " + nazwaKlienta + " wybrał " + daneWiadomosci);
@@ -176,7 +171,11 @@ namespace AplikacjaSerwerowa
                                     {
                                         isCardPickUpRequest = true;
                                     }
-                                    //2016-06-01 - zrob implementacje blokowania przycisku
+                                    if (socket.RemoteEndPoint.ToString().Equals(RozgrywkaPokoj1.WszyscyGracze[i]._Socket.RemoteEndPoint.ToString())
+                                        && playerHavingTurn != RozgrywkaPokoj1.WszyscyGracze[i].id)
+                                    {
+
+                                    }
                                 }
                                 break;
                             }
@@ -316,6 +315,14 @@ namespace AplikacjaSerwerowa
                             {
                                 dziennik.Items.Add("Gracz " + nazwaKlienta + " zażądał rozpoczęcia gry");
                                 SendCommand(GameSendCommand.ListAllPlayerIDs, 0, 0, null, 0); //kod 2
+                                try
+                                {
+                                    socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, new AsyncCallback(ReceiveCallback), socket);
+                                }
+                                catch (Exception)
+                                {
+                                    //ignored
+                                }
                                 Run();
                                 break;
                             }
@@ -474,14 +481,14 @@ namespace AplikacjaSerwerowa
                     {
                         _toSend[1] = 3;//code
                         _toSend[0] = Convert.ToByte(2);//length
-                        SendDataToALL(_toSend);
+                        Sendata(socket, _toSend);
                         break;
                     }
                 case GameSendCommand.DeactivateGetUpCardButton:
                     {
                         _toSend[1] = 4;//code
                         _toSend[0] = Convert.ToByte(2);//length
-                        SendDataToALL(_toSend);
+                        Sendata(socket, _toSend);
                         break;
                     }
                 //nie jest uberkonieczne
@@ -608,6 +615,9 @@ namespace AplikacjaSerwerowa
                 }
             }
             SendCommand(GameSendCommand.NumberOfCards, 0, 0, null, 0);
+            for (int i = 0; i < liczbaGraczy; i++){
+                SendCommand(GameSendCommand.DeactivateGetUpCardButton, 0,0, RozgrywkaPokoj1.WszyscyGracze[i]._Socket, 0);
+            }
             for (int i = 1; i <= liczbaGraczy; i++)
             {
                 Console.WriteLine("Gracz " + i + ":");
