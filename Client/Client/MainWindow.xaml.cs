@@ -87,5 +87,10 @@ namespace Client
         {
             Network.Disconnect();
         }
+
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+
+        }
     }
 }
