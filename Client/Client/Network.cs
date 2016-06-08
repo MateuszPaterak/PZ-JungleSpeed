@@ -214,7 +214,7 @@ namespace Client
                         if (Application.Current.MainWindow.Dispatcher.CheckAccess())
                             ((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = true;
                         else
-                            JoinWindowObj.WindowJoinRoom.Dispatcher.Invoke(
+                            ((MainWindow)Application.Current.MainWindow).Dispatcher.Invoke(
                                  DispatcherPriority.Background,
                                 new Action (()=>((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = true));
                         break;
@@ -224,7 +224,7 @@ namespace Client
                         if (Application.Current.MainWindow.Dispatcher.CheckAccess())
                             ((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = false;
                         else
-                            JoinWindowObj.WindowJoinRoom.Dispatcher.Invoke(
+                            ((MainWindow)Application.Current.MainWindow).Dispatcher.Invoke(
                                  DispatcherPriority.Background,
                                 new Action(() => ((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = false));
                         break;
@@ -312,7 +312,7 @@ namespace Client
                         if (Application.Current.MainWindow.Dispatcher.CheckAccess())
                             ((MainWindow)Application.Current.MainWindow).CUserControl.Content = new UCMainScreen();
                         else
-                            JoinWindowObj.WindowJoinRoom.Dispatcher.Invoke(
+                            ((MainWindow)Application.Current.MainWindow).Dispatcher.Invoke(
                                  DispatcherPriority.Background,
                                 new Action(() => ((MainWindow)Application.Current.MainWindow).CUserControl.Content = new UCMainScreen()));
                         
