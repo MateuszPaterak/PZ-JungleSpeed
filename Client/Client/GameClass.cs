@@ -280,7 +280,7 @@ namespace Client
                 }
 
             }
-            catch (Exception ex)
+            catch (Exception )
             {
                 //MessageBox.Show(ex.ToString());
                 //ignored
@@ -293,7 +293,7 @@ namespace Client
                             new Action(() => ((MainWindow)Application.Current.MainWindow).CUserControl.Content
                             = MyContentClassWindow.ChangeContent(ContNum.PlayersBoard)));
             }
-            catch(Exception ex)
+            catch(Exception )
             { }
 
             try
@@ -303,7 +303,7 @@ namespace Client
                         new Action(() => ((MainWindow)Application.Current.MainWindow).CUserControl.Content
                         = new PlayersTableManager(playerAmount)));
             }
-            catch (Exception ex)
+            catch (Exception )
             {
             }
 
@@ -313,7 +313,7 @@ namespace Client
                             DispatcherPriority.Background,
                             new Action(GameClass.AddIdPlaceIdPlayer)); //create list of idPlace at the table);
             }
-            catch (Exception ex)
+            catch (Exception )
             {
             }
 
@@ -324,7 +324,7 @@ namespace Client
                             DispatcherPriority.Background,
                             new Action(GameClass.SetAllNewPlayerName));
             }
-            catch (Exception ex)
+            catch (Exception )
             {
             }
             //waiting for control at the gamelogic from server

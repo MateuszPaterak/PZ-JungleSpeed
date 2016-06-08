@@ -136,7 +136,7 @@ namespace Client
                     OnReceiveLoop,
                     MyClient);
             }
-            catch (Exception ex)
+            catch (Exception )
             {
              //   MessageBox.Show("Network.OnReceiveLoop :" + ex);
                 //_runnignReceive = false;
