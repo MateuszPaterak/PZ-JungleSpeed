@@ -640,12 +640,25 @@ namespace AplikacjaSerwerowa
                 {
                     playerHavingTurn = RozgrywkaPokoj1.WszyscyGracze[j].id;
                     Pojedynek();
+                    if (isCardPickUpRequest)
+                    {
+                        SendCommand(GameSendCommand.ActivateGetUpCardButton, RozgrywkaPokoj1.WszyscyGracze[j].id,
+                        0, RozgrywkaPokoj1.WszyscyGracze[j]._Socket, 0, null);
+                    }
                     if (!isCardPickUpRequest) j = j - 1;
                     else{
 
                     //ruch 1 gracza - jeśli gracz ma jakąś kartę w dłoni, to podnies ją
                     if (RozgrywkaPokoj1.WszyscyGracze[j].InHand.Any())
                     {
+                        if(RozgrywkaPokoj1.WszyscyGracze[j].InHand.Count() == 0)
+                        {
+                                for(int i = 0; i < RozgrywkaPokoj1.WszyscyGracze[j].OnTable.Count(); i++)
+                                {
+                                    RozgrywkaPokoj1.WszyscyGracze[j].InHand.Add(RozgrywkaPokoj1.WszyscyGracze[i].OnTable[i]);
+                                    RozgrywkaPokoj1.WszyscyGracze[j].OnTable.RemoveRange(0, 1); //usuniecie karty z reki
+                                }
+                            }
                         temp = RozgrywkaPokoj1.WszyscyGracze[j].InHand[0];
                         if (temp.wzor == 21)
                         {
@@ -724,11 +737,11 @@ namespace AplikacjaSerwerowa
                             if(RozgrywkaPokoj1.typ == "POM"){
                             SendCommand(GameSendCommand.DuelLose, playerTakingTotem, 0, RozgrywkaPokoj1.WszyscyGracze[RozgrywkaPokoj1.loser]._Socket, 0, null);
                                 for(int a = 0; a < liczbaGraczy; a++){
-                                    SendCommand(GameSendCommand.DuelWin, 99, 0, RozgrywkaPokoj1.WszyscyGracze[a]._Socket, 0, null);
+                                    SendCommand(GameSendCommand.DuelWin, RozgrywkaPokoj1.loser, 0, RozgrywkaPokoj1.WszyscyGracze[a]._Socket, 0, null);
                                 }
                             }
                             if(RozgrywkaPokoj1.typ == "WAL"){
-                            SendCommand(GameSendCommand.DuelLose, 99, 0, RozgrywkaPokoj1.WszyscyGracze[RozgrywkaPokoj1.loser]._Socket, 0, null);
+                            SendCommand(GameSendCommand.DuelLose, RozgrywkaPokoj1.loser, 0, RozgrywkaPokoj1.WszyscyGracze[RozgrywkaPokoj1.loser]._Socket, 0, null);
                             SendCommand(GameSendCommand.DuelWin, playerTakingTotem, 0, RozgrywkaPokoj1.WszyscyGracze[RozgrywkaPokoj1.winner]._Socket, 0, null);
                             }
                             duelIsOn = false;
@@ -736,7 +749,6 @@ namespace AplikacjaSerwerowa
                             RozgrywkaPokoj1.typ = "";
                         }
                     }
-                    sw.Stop();
                     break;
                 }
             }
@@ -820,9 +832,8 @@ namespace AplikacjaSerwerowa
                             isTakeTotemRequest = false;
                         }
                     }
-                    sw.Stop();
-                    break;
                 }
+                break;
             }
 
 
@@ -861,9 +872,7 @@ namespace AplikacjaSerwerowa
 
                             }
                         }
-
                     }
-                    sw.Stop();
                     break;
                 }
                 Pojedynek();

@@ -40,8 +40,9 @@ namespace Client
                      DispatcherPriority.Background,
                      new Action(() =>
                      {
-                         UCMainScreen uc = (UCMainScreen)CUserControl.Content;
-                         GameClass.MyPlayerName = uc.TbPlayerName.Text ?? "Player";
+                         //UCMainScreen uc = (UCMainScreen)CUserControl.Content;
+                         //GameClass.MyPlayerName = uc.TbPlayerName.Text ?? "Player";
+                         GameClass.MyPlayerName = "Player";
                      }));
             }
             catch (Exception)
@@ -60,9 +61,10 @@ namespace Client
                 Application.Current.Dispatcher.BeginInvoke(
                       DispatcherPriority.Background,
                       new Action(() =>
-                      {
-                          UCMainScreen uc = (UCMainScreen)CUserControl.Content;
-                          GameClass.MyPlayerName = uc.TbPlayerName.Text ?? "Player";
+                      { 
+                          //UCMainScreen uc = (UCMainScreen)CUserControl.Content;
+                          //GameClass.MyPlayerName = uc.TbPlayerName.Text ?? "Player";
+                          GameClass.MyPlayerName = "Player";
                       }));
             }
             catch (Exception)

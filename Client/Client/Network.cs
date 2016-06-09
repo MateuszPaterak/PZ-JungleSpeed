@@ -217,10 +217,19 @@ namespace Client
                      //    Application.Current.MainWindow.Dispatcher.Invoke(
                      //         DispatcherPriority.Background,
                      //        new Action (()=>((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = true));
-                        MessageBox.Show("Możesz podnieść kartę");
 
-                        ((MainWindow)Application.Current.MainWindow).EnableGetMyCard();
+                        /*Application.Current.MainWindow.Dispatcher.Invoke(
+                                 DispatcherPriority.Background,
+                                new Action(() => 
+                                {
+                                    string str = ((MainWindow)Application.Current.MainWindow).TbMenu.Text;
+                                    ((MainWindow)Application.Current.MainWindow).TbMenu.Text = "Możesz podnieść kartę" + str;
+                        }));*/
+
+                       // MessageBox.Show("Możesz podnieść kartę");
                         
+                        //((MainWindow)Application.Current.MainWindow).EnableGetMyCard();
+
                         break;
                     }
                 case 4:
@@ -231,7 +240,8 @@ namespace Client
                      // Application.Current.MainWindow.Dispatcher.BeginInvoke(
                      //     DispatcherPriority.Background,
                      //     new Action(() => ((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = false));
-                        ((MainWindow)Application.Current.MainWindow).DisableGetMyCard();
+                       
+                        // ((MainWindow)Application.Current.MainWindow).DisableGetMyCard();
                         break;
                     }
                 case 5:
@@ -244,6 +254,16 @@ namespace Client
                 case 6:
                     {//message to winner of the fight for totem
                         MessageBox.Show("Wygrałeś pojedynek o totem!!!");
+                        /*
+                        ((MainWindow)Application.Current.MainWindow).Dispatcher.Invoke(
+                                 DispatcherPriority.Background,
+                                new Action(() =>
+                                {
+                                    string str = ((MainWindow)Application.Current.MainWindow).TbMenu.Text;
+                                    ((MainWindow)Application.Current.MainWindow).TbMenu.Text = "Wygrałeś pojedynek o totem!!!" + str;
+                                }));
+                                */
+                        //MessageBox.Show("Wygrałeś pojedynek o totem!!!");
                         break;
                     }
                 case 7:

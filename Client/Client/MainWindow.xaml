@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Client"
         mc:Ignorable="d"
-        Title="Wojna o totem" Height="650" Width="700" Closing="Window_Closing" SizeChanged="Window_SizeChanged"
-        MinHeight="650" MinWidth="700">
+        Title="Wojna o totem" Height="488.163" Width="472.653" Closing="Window_Closing" SizeChanged="Window_SizeChanged"
+        MinHeight="700" MinWidth="650">
     <Grid>
         <Grid.Background>
             <ImageBrush ImageSource="Pictures/bokeh.jpg"/>
@@ -21,9 +21,10 @@
             </MenuItem>
         </Menu>
         <ContentControl x:Name="CUserControl" Grid.Row="0" Margin="10,35,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="500" Width="500"/>
-        <Button x:Name="BtGetUpCard" Content="Podnieś &#xD;&#xA;kartę" HorizontalAlignment="Right" Margin="0,48,75,0" VerticalAlignment="Top" Width="80" Height="50" Click="BtGetUpCard_Click"/>
-        <Button x:Name="BtGetTotem" Content="Weź&#xD;&#xA;totem" HorizontalAlignment="Right" Margin="0,130,75,0" VerticalAlignment="Top" Width="80" Height="50" Click="BtGetTotem_Click"/>
-        <Button x:Name="BtOutOfGameplay" Content="Opuść&#xD;&#xA;rozgrywkę" HorizontalAlignment="Right" Margin="0,275,75,0" VerticalAlignment="Top" Width="80" Height="50" Click="BtOutOfGameplay_Click"/>
-        
+        <Button x:Name="BtGetUpCard" Content="Podnieś &#xD;&#xA;kartę" HorizontalAlignment="Right" Margin="0,48,25,0" VerticalAlignment="Top" Width="80" Height="50" Click="BtGetUpCard_Click"/>
+        <Button x:Name="BtGetTotem" Content="Weź&#xD;&#xA;totem" HorizontalAlignment="Right" Margin="0,130,25,0" VerticalAlignment="Top" Width="80" Height="50" Click="BtGetTotem_Click"/>
+        <Button x:Name="BtOutOfGameplay" Content="Opuść&#xD;&#xA;rozgrywkę" HorizontalAlignment="Right" Margin="0,275,25,0" VerticalAlignment="Top" Width="80" Height="50" Click="BtOutOfGameplay_Click"/>
+        <TextBox x:Name="TbMenu" HorizontalAlignment="Left" Height="120" Margin="10,540,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="500" Visibility="Hidden"/>
+
     </Grid>
 </Window>
