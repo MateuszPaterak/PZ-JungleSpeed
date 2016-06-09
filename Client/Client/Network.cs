@@ -211,22 +211,25 @@ namespace Client
                     }
                 case 3:
                     {//enable button GetMyCard
-                        if (Application.Current.MainWindow.Dispatcher.CheckAccess())
-                            ((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = true;
-                        else
-                            ((MainWindow)Application.Current.MainWindow).Dispatcher.Invoke(
-                                 DispatcherPriority.Background,
-                                new Action (()=>((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = true));
+                        //if (Application.Current.MainWindow.Dispatcher.CheckAccess())
+                        //    ((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = true;
+                        //else
+                        //    Application.Current.MainWindow.Dispatcher.Invoke(
+                        //         DispatcherPriority.Background,
+                        //        new Action (()=>((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = true));
+                        ((MainWindow)Application.Current.MainWindow).EnableGetMyCard();
+                        MessageBox.Show("Możesz podnieść kartę");
                         break;
                     }
                 case 4:
                     {//disable button GetMyCard
-                        if (Application.Current.MainWindow.Dispatcher.CheckAccess())
-                            ((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = false;
-                        else
-                            ((MainWindow)Application.Current.MainWindow).Dispatcher.Invoke(
-                                 DispatcherPriority.Background,
-                                new Action(() => ((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = false));
+                     // if ((MainWindow)Application.Current.MainWindow.Dispatcher.CheckAccess())
+                     //     ((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = false;
+                     // else
+                     // Application.Current.MainWindow.Dispatcher.BeginInvoke(
+                     //     DispatcherPriority.Background,
+                     //     new Action(() => ((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = false));
+                        ((MainWindow)Application.Current.MainWindow).DisableGetMyCard();
                         break;
                     }
                 case 5:
@@ -309,12 +312,9 @@ namespace Client
 
                         GameClass.ClearGameClass();
 
-                        if (Application.Current.MainWindow.Dispatcher.CheckAccess())
-                            ((MainWindow)Application.Current.MainWindow).CUserControl.Content = new UCMainScreen();
-                        else
-                            ((MainWindow)Application.Current.MainWindow).Dispatcher.Invoke(
-                                 DispatcherPriority.Background,
-                                new Action(() => ((MainWindow)Application.Current.MainWindow).CUserControl.Content = new UCMainScreen()));
+                        Application.Current.MainWindow.Dispatcher.BeginInvoke(
+                            DispatcherPriority.Background,
+                            new Action(() => ((MainWindow)Application.Current.MainWindow).CUserControl.Content = new UCMainScreen()));
                         
                         break;
                     }

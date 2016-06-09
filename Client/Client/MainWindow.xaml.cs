@@ -18,6 +18,20 @@ namespace Client
             CUserControl.Content = new UCMainScreen();
         }
 
+        public void EnableGetMyCard()
+        {
+                Application.Current.MainWindow.Dispatcher.Invoke(
+                     DispatcherPriority.Background,
+                    new Action (()=>((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = true));
+        }
+
+        public void DisableGetMyCard()
+        {
+             Application.Current.Dispatcher.BeginInvoke(
+                 DispatcherPriority.Background,
+                 new Action(() => ((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = false));
+        }
+
         private void NewRoom(object sender, RoutedEventArgs e) //menu
         {
             try
