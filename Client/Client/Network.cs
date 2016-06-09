@@ -211,14 +211,16 @@ namespace Client
                     }
                 case 3:
                     {//enable button GetMyCard
-                        //if (Application.Current.MainWindow.Dispatcher.CheckAccess())
-                        //    ((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = true;
-                        //else
-                        //    Application.Current.MainWindow.Dispatcher.Invoke(
-                        //         DispatcherPriority.Background,
-                        //        new Action (()=>((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = true));
-                        ((MainWindow)Application.Current.MainWindow).EnableGetMyCard();
+                     //if (Application.Current.MainWindow.Dispatcher.CheckAccess())
+                     //    ((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = true;
+                     //else
+                     //    Application.Current.MainWindow.Dispatcher.Invoke(
+                     //         DispatcherPriority.Background,
+                     //        new Action (()=>((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = true));
                         MessageBox.Show("Możesz podnieść kartę");
+
+                        ((MainWindow)Application.Current.MainWindow).EnableGetMyCard();
+                        
                         break;
                     }
                 case 4:
