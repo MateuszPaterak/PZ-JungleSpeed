@@ -9,11 +9,13 @@ namespace AplikacjaSerwerowa
     public class Gracze
     {
         public List<Gracz> WszyscyGracze = new List<Gracz>();
-        int winner;
+        public int winner;
         string KartyGracz1 = "";
         string KartyGracz2 = "";
+        public int loser;
+        public string typ = "";
 
-        public void SprawdzCzyNaStoleJestSymbol(Karta Karta1, int IDGracza)
+        public void SprawdzCzyNaStoleJestSymbol(Karta Karta1, int IDGracza, int liczbaGraczy)
         {
             for (int i = 0; i < WszyscyGracze.Count; i++)
             {
@@ -23,6 +25,10 @@ namespace AplikacjaSerwerowa
                     {
                         Walka(IDGracza, i);
 
+                    }
+                    else
+                    {
+                        Pomylka(IDGracza, liczbaGraczy);
                     }
                 }
             }
@@ -71,9 +77,10 @@ namespace AplikacjaSerwerowa
                 KartyGracz2 = "null";
             }
             Console.WriteLine("JEST WALKA! Biją się karty: " + KartyGracz1 + " oraz " + KartyGracz2);
-            //Console.WriteLine("Jest WALKA! Kto ją wygrywa? Wpisz gracz " + (Gracz1 + 1) + " lub " + (Gracz2 + 1));
-            winner = Gracz1;
 
+            //zwyciezca gracz siegajacy po totem
+            winner = Gracz1;
+            loser = Gracz2;
 
             if (winner == (Gracz1 + 1))
             {
@@ -88,6 +95,23 @@ namespace AplikacjaSerwerowa
                 WszyscyGracze[Gracz1].InHand.AddRange(WszyscyGracze[Gracz2].OnTable);
                 WszyscyGracze[Gracz2].OnTable.Clear();
                 WszyscyGracze[Gracz1].OnTable.Clear();
+            }
+
+            typ = "WAL";
+        }
+
+        //pomylka skutkuje tym, ze gracz "ciagnie" wszystkie karty ze stolu
+        public void Pomylka(int Gracz1, int liczbaGraczy)
+        {
+            if (WszyscyGracze[Gracz1].OnTable.Any())
+            {
+                for (int i = 0; i < liczbaGraczy; i++) { 
+                    WszyscyGracze[Gracz1].InHand.AddRange(WszyscyGracze[i].OnTable);
+                    WszyscyGracze[i].OnTable.Clear();
+                    loser = Gracz1;
+                    typ = "POM";
+                }
+                Console.WriteLine("Wszystkie karty ze stołu zdobyte przez: " + Gracz1);
             }
         }
 

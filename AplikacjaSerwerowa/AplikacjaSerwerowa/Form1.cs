@@ -171,29 +171,23 @@ namespace AplikacjaSerwerowa
                                     {
                                         isCardPickUpRequest = true;
                                     }
-                                    if (socket.RemoteEndPoint.ToString().Equals(RozgrywkaPokoj1.WszyscyGracze[i]._Socket.RemoteEndPoint.ToString())
-                                        && playerHavingTurn != RozgrywkaPokoj1.WszyscyGracze[i].id)
-                                    {
-
-                                    }
                                 }
                                 break;
                             }
-                        //DOIMPLEMENTOWAĆ PÓŹNIEJ
                         //gracz wychodzi z gry
                         case 53:
                             {
                                 dziennik.Items.Add("Gracz " + nazwaKlienta + " niestety wyszedł z gry :(");
 
-                                //CzyjRuch.Gracz
                                 for (int i = 0; i < RozgrywkaPokoj1.WszyscyGracze.Count; i++)
                                 {
-
-                                    //DOIMPLEMENTUJ TO GUNWO
+                                    if (RozgrywkaPokoj1.WszyscyGracze[i]._Socket == socket)
+                                    {
+                                            RozgrywkaPokoj1.WszyscyGracze.RemoveAt(i);
+                                            listaGraczy.Items.RemoveAt(i);
+                                    }
                                 }
-                                //poinformowanie wszystkich graczy
-                                //to ponizej chyba nie stad? 2016-06-01
-                                //SendCommand(GameSendCommand.PickedCard, 1, 2, null, 0);
+                                //poinformowanie wszystkich graczy (?)
 
                                 break;
                             }
@@ -258,6 +252,15 @@ namespace AplikacjaSerwerowa
                                 //na sztywno jest
                                 dziennik.Items.Add("Gracz " + nazwaKlienta + " chce wyjsc z pokoju");
                                 //wypisz z pokoju
+                                for (int i = 0; i < Pokoj1.WszyscyGracze.Count; i++)
+                                {
+                                    if (socket == Pokoj1.WszyscyGracze[i]._Socket)
+                                    {
+                                        Pokoj1.WszyscyGracze.RemoveAt(i);
+                                    }
+                                }
+                                //wyslij liste z graczami bioracymi udzial
+                                SendCommand(GameSendCommand.ListAllPlayerInRoomToStartGame, 0, 0, null, 0);
                                 break;
                             }
                         case 60:
@@ -308,7 +311,14 @@ namespace AplikacjaSerwerowa
                             {
                                 //na sztywno jest //na razie zbedne
                                 dziennik.Items.Add("Gracz " + nazwaKlienta + " chce usunac gracza z pokoju pokoj");
-                                //uwun konkretnego gracza
+                                for (int i = 0; i < Pokoj1.WszyscyGracze.Count; i++)
+                                {
+                                    if (Pokoj1.WszyscyGracze[i].id == BitConverter.ToInt32(_messageContent, 0))
+                                    {
+                                        Pokoj1.WszyscyGracze.RemoveAt(i);
+                                        dziennik.Items.Add("Liczba klientów połączonych: " + Pokoj1.WszyscyGracze.Count.ToString());
+                                    }
+                                }
                                 break;
                             }
                         case 65:
@@ -477,6 +487,7 @@ namespace AplikacjaSerwerowa
                         Array.Clear(temp2byte, 0, temp2byte.Length);
                         break;
                     }
+                //na razie odpusc
                 case GameSendCommand.ActivateGetUpCardButton:
                     {
                         _toSend[1] = 3;//code
@@ -484,6 +495,7 @@ namespace AplikacjaSerwerowa
                         Sendata(socket, _toSend);
                         break;
                     }
+                //na razie odpusc
                 case GameSendCommand.DeactivateGetUpCardButton:
                     {
                         _toSend[1] = 4;//code
@@ -497,6 +509,7 @@ namespace AplikacjaSerwerowa
                         _toSend[1] = 6;//code
                         _toSend[0] = Convert.ToByte(2);//length
                         Sendata(socket, _toSend);//tu dodac socket wygranego
+                        SendCommand(GameSendCommand.PickedCard, idGracza, 0, socket, 0, null);
                         break;
                     }
                 //nie jest uberkonieczne
@@ -505,6 +518,7 @@ namespace AplikacjaSerwerowa
                         _toSend[1] = 7;//code
                         _toSend[0] = Convert.ToByte(2);//length
                         Sendata(socket, _toSend);//tu dodac socket przegranego
+                        SendCommand(GameSendCommand.PickedCard, idGracza, 0, socket, 0, null);
                         break;
                     }
                 case GameSendCommand.EndOfGame:
@@ -516,7 +530,6 @@ namespace AplikacjaSerwerowa
                         break;
                     }
             }
-
         }
 
         //wyslij do 1 osoby
@@ -615,9 +628,6 @@ namespace AplikacjaSerwerowa
                 }
             }
             SendCommand(GameSendCommand.NumberOfCards, 0, 0, null, 0);
-            for (int i = 0; i < liczbaGraczy; i++){
-                SendCommand(GameSendCommand.DeactivateGetUpCardButton, 0,0, RozgrywkaPokoj1.WszyscyGracze[i]._Socket, 0);
-            }
             for (int i = 1; i <= liczbaGraczy; i++)
             {
                 Console.WriteLine("Gracz " + i + ":");
@@ -630,7 +640,6 @@ namespace AplikacjaSerwerowa
                 {
                     playerHavingTurn = RozgrywkaPokoj1.WszyscyGracze[j].id;
                     Pojedynek();
-                    if (RozgrywkaPokoj1.WszyscyGracze[j]._Name == "GM") j++;
                     if (!isCardPickUpRequest) j = j - 1;
                     else{
 
@@ -644,25 +653,24 @@ namespace AplikacjaSerwerowa
                         }
                         if (temp.wzor == 22)
                         {
-                            WszyscyNaraz(j);
+                            WszyscyNaraz();
                         }
                         if (temp.wzor == 23)
                         {
-                            Glosowanie(j);
+                            Glosowanie();
                         }
                         RozgrywkaPokoj1.WszyscyGracze[j].OnTable.Add(temp); //wyrzucenie 1 karty na stol
                         RozgrywkaPokoj1.WszyscyGracze[j].InHand.RemoveRange(0, 1); //usuniecie karty z reki
                         
                         SendCommand(GameSendCommand.PickedCard, RozgrywkaPokoj1.WszyscyGracze[j].id, temp.idKarty, null, 0);
 
-                        Pojedynek();
+                        if (temp.wzor != 21 && temp.wzor != 22 && temp.wzor != 23) Pojedynek();
 
                     }
+                        //gdy gracz nie ma kart
                     else if (RozgrywkaPokoj1.WszyscyGracze[j].OnTable.Any())
                     {
                         Pojedynek();
-                        //RozgrywkaPokoj1.SprawdzCzyNaStoleJestSymbol(RozgrywkaPokoj1.WszyscyGracze[j].OnTable
-                            //[RozgrywkaPokoj1.WszyscyGracze[j].OnTable.Count - 1], j);
                     }
 
                     for (int i = 1; i <= liczbaGraczy; i++)
@@ -712,9 +720,20 @@ namespace AplikacjaSerwerowa
                         sw.Start(); // if less than 5000 milliseconds have elapsed, continue looping
                         // and resume time measurement
                         if (isTakeTotemRequest) { 
-                            RozgrywkaPokoj1.SprawdzCzyNaStoleJestSymbol(temp, playerTakingTotem);
+                            RozgrywkaPokoj1.SprawdzCzyNaStoleJestSymbol(temp, playerTakingTotem, liczbaGraczy);
+                            if(RozgrywkaPokoj1.typ == "POM"){
+                            SendCommand(GameSendCommand.DuelLose, playerTakingTotem, 0, RozgrywkaPokoj1.WszyscyGracze[RozgrywkaPokoj1.loser]._Socket, 0, null);
+                                for(int a = 0; a < liczbaGraczy; a++){
+                                    SendCommand(GameSendCommand.DuelWin, 99, 0, RozgrywkaPokoj1.WszyscyGracze[a]._Socket, 0, null);
+                                }
+                            }
+                            if(RozgrywkaPokoj1.typ == "WAL"){
+                            SendCommand(GameSendCommand.DuelLose, 99, 0, RozgrywkaPokoj1.WszyscyGracze[RozgrywkaPokoj1.loser]._Socket, 0, null);
+                            SendCommand(GameSendCommand.DuelWin, playerTakingTotem, 0, RozgrywkaPokoj1.WszyscyGracze[RozgrywkaPokoj1.winner]._Socket, 0, null);
+                            }
                             duelIsOn = false;
                             isTakeTotemRequest = false;
+                            RozgrywkaPokoj1.typ = "";
                         }
                     }
                     sw.Stop();
@@ -723,6 +742,7 @@ namespace AplikacjaSerwerowa
             }
         }
 
+        //nietestowane
         public void Kolory(int graczWyrzucajacyKolor)
         {
             int i = 1;
@@ -769,24 +789,85 @@ namespace AplikacjaSerwerowa
             }
         }
 
-        public void Glosowanie(int j)
+        //nietestowane
+        //glosowanie blokuje gre na 3 sekundy - jesli w trakcie glosowania bedzie zabranie totemu, to gracz odklada karty pod totem
+        public void Glosowanie()
         {
 
             Console.WriteLine("Ktory z graczy ma oddac karty pod totem?");
-            podTotemem.AddRange(RozgrywkaPokoj1.WszyscyGracze[j].OnTable);
-            RozgrywkaPokoj1.WszyscyGracze[j].OnTable.Clear();
-            if (!(RozgrywkaPokoj1.WszyscyGracze[j].InHand).Any() && !(RozgrywkaPokoj1.WszyscyGracze[j].OnTable).Any())
+            Stopwatch sw = new Stopwatch(); // sw cotructor
+            sw.Start(); // starts the stopwatch
+            for (int i = 0; ; i++)
             {
-                isWinner = true;
-                Console.WriteLine("Zwyciężył gracz: " + (j + 1) + ". GRATULUJĘ!");
+                if (i % 100000 == 0) // if in 100000th iteration (could be any other large number
+                // depending on how often you want the time to be checked) 
+                {
+                    sw.Stop(); // stop the time measurement
+                    if (sw.ElapsedMilliseconds > 3000) // check if desired period of time has elapsed
+                    {
+                        break; // if more than 5000 milliseconds have passed, stop looping and return
+                        // to the existing code
+                    }
+                    else
+                    {
+                        sw.Start(); // if less than 5000 milliseconds have elapsed, continue looping
+                        // and resume time measurement
+                        if (isTakeTotemRequest)
+                        {
+                            podTotemem.AddRange(RozgrywkaPokoj1.WszyscyGracze[playerTakingTotem].OnTable);
+                            RozgrywkaPokoj1.WszyscyGracze[playerTakingTotem].OnTable.Clear();
+                            duelIsOn = false;
+                            isTakeTotemRequest = false;
+                        }
+                    }
+                    sw.Stop();
+                    break;
+                }
             }
+
 
         }
 
-        public void WszyscyNaraz(int j)
+        //nie testowalem
+        public void WszyscyNaraz()
         {
-            //brak mechanizmu
-            //timer odliczanie do 3 sekund i mozliwosc chwycenia przez kogokolwiek
+            Stopwatch sw = new Stopwatch(); // sw cotructor
+            sw.Start(); // starts the stopwatch
+            for (int i = 0; ; i++)
+            {
+                if (i % 100000 == 0) // if in 100000th iteration (could be any other large number
+                // depending on how often you want the time to be checked) 
+                {
+                    sw.Stop(); // stop the time measurement
+                    if (sw.ElapsedMilliseconds > 3000) // check if desired period of time has elapsed
+                    {
+                        break; // if more than 3000 milliseconds have passed, stop looping and return
+                        // to the existing code
+                    }
+                    else
+                    {
+                        sw.Start(); // if less than 5000 milliseconds have elapsed, continue looping
+                        // and resume time measurement
+                        for (int a = 0; a < RozgrywkaPokoj1.WszyscyGracze.Count; a++)
+                        {
+                            if (RozgrywkaPokoj1.WszyscyGracze[a].InHand.Any())
+                            {
+                                temp = RozgrywkaPokoj1.WszyscyGracze[a].InHand[0];
+
+                                RozgrywkaPokoj1.WszyscyGracze[a].OnTable.Add(temp); //wyrzucenie 1 karty na stol
+                                RozgrywkaPokoj1.WszyscyGracze[a].InHand.RemoveRange(0, 1); //usuniecie karty z reki
+
+                                SendCommand(GameSendCommand.PickedCard, RozgrywkaPokoj1.WszyscyGracze[a].id, temp.idKarty, null, 0);
+
+                            }
+                        }
+
+                    }
+                    sw.Stop();
+                    break;
+                }
+                Pojedynek();
+            }
         }
 
 
