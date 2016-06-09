@@ -34,8 +34,6 @@
             this.listaGraczy = new System.Windows.Forms.ListBox();
             this.label3 = new System.Windows.Forms.Label();
             this.dziennik = new System.Windows.Forms.ListBox();
-            this.listBox1 = new System.Windows.Forms.ListBox();
-            this.label4 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // comboBox1
@@ -90,30 +88,11 @@
             this.dziennik.Size = new System.Drawing.Size(668, 251);
             this.dziennik.TabIndex = 6;
             // 
-            // listBox1
-            // 
-            this.listBox1.FormattingEnabled = true;
-            this.listBox1.Location = new System.Drawing.Point(336, 25);
-            this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(191, 95);
-            this.listBox1.TabIndex = 8;
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(333, 9);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(137, 13);
-            this.label4.TabIndex = 9;
-            this.label4.Text = "Gracze gotowi do rozgrywki";
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(695, 400);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.listBox1);
             this.Controls.Add(this.dziennik);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.listaGraczy);
@@ -135,8 +114,6 @@
         private System.Windows.Forms.ListBox listaGraczy;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ListBox dziennik;
-        private System.Windows.Forms.ListBox listBox1;
-        private System.Windows.Forms.Label label4;
     }
 }
 
