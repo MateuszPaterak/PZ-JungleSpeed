@@ -23,6 +23,10 @@ namespace Client
         public UCMainScreen()
         {
             InitializeComponent();
+            if(GameClass.MyPlayerName!=null)
+            {
+                TbPlayerName.Text = GameClass.MyPlayerName;
+            }
         }
         
         private void BtNewServer_Click(object sender, RoutedEventArgs e)

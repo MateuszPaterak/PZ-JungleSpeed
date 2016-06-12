@@ -109,7 +109,8 @@ namespace Client
                     { }
                     try
                     {
-                        _refreshAllListThread.Join();
+                        //_refreshAllListThread.Join();
+                        _refreshAllListThread.Abort();
                     }
                     catch (Exception)
                     { }

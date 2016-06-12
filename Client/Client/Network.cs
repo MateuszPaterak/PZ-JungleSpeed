@@ -2,6 +2,7 @@
 using System.Net.Sockets;
 using System.Text;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Threading;
 
 namespace Client
@@ -25,7 +26,8 @@ namespace Client
                     try
                     {
                         MyClient = new TcpClient(Host, port+ portOffset);
-                        MessageBox.Show("Nawiązano połączenie z " + Host);
+                        //MessageBox.Show("Nawiązano połączenie z " + Host);
+                        MainWindow.AddGameHistoryText("Nawiązano połączenie z " + Host);
                         return true;
                     }
                     catch (Exception)
@@ -37,7 +39,8 @@ namespace Client
             }
             if (MyClient == null) //not connected and exist after trying to connect
             {
-                MessageBox.Show("Nie udało się nawiązać połączenia z serwerem");
+                //MessageBox.Show("Nie udało się nawiązać połączenia z serwerem");
+                MainWindow.AddGameHistoryText("Nie udało się nawiązać połączenia z serwerem");
                 return false;
             }
 
@@ -55,7 +58,8 @@ namespace Client
                 try
                 {
                     MyClient = new TcpClient(Host, port + portOffset);
-                    MessageBox.Show("Nawiązano połączenie z serwerem " + Host);
+                    //MessageBox.Show("Nawiązano połączenie z serwerem " + Host);
+                    MainWindow.AddGameHistoryText("Nawiązano połączenie z " + Host);
                     return true;
                 }
                 catch (Exception)
@@ -65,7 +69,8 @@ namespace Client
                 portOffset++;
             } while (portOffset < 11);
 
-            MessageBox.Show("Nie udało się nawiązać połączenia z serwerem");
+            //MessageBox.Show("Nie udało się nawiązać połączenia z serwerem");
+            MainWindow.AddGameHistoryText("Nie udało się nawiązać połączenia z serwerem");
             return false; //exist but not connected after trying to connect
         }
 
@@ -167,7 +172,7 @@ namespace Client
                 //ignored
             }
         }
-
+        
         private static void ReceiveCommand()
         {
             if(_byteDataReceive==null)   return;
@@ -188,6 +193,8 @@ namespace Client
                                 GameClass.AddPlayerAmountCard(idPlayer,amountOfCards);
                             }
                         GameRoom.InitGame(amountOfPlayers);
+                        MainWindow.ClearGameHistoryText();
+                        MainWindow.AddGameHistoryText("Rozpoczęto grę!!!");
                         break;
                     }
                 case 2:
@@ -211,37 +218,13 @@ namespace Client
                     }
                 case 3:
                     {//enable button GetMyCard
-                     //if (Application.Current.MainWindow.Dispatcher.CheckAccess())
-                     //    ((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = true;
-                     //else
-                     //    Application.Current.MainWindow.Dispatcher.Invoke(
-                     //         DispatcherPriority.Background,
-                     //        new Action (()=>((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = true));
-
-                        /*Application.Current.MainWindow.Dispatcher.Invoke(
-                                 DispatcherPriority.Background,
-                                new Action(() => 
-                                {
-                                    string str = ((MainWindow)Application.Current.MainWindow).TbMenu.Text;
-                                    ((MainWindow)Application.Current.MainWindow).TbMenu.Text = "Możesz podnieść kartę" + str;
-                        }));*/
-
-                       // MessageBox.Show("Możesz podnieść kartę");
-                        
-                        //((MainWindow)Application.Current.MainWindow).EnableGetMyCard();
-
+                        MainWindow.EnableGetMyCard();
+                        MainWindow.AddGameHistoryText("Twoja kolej na odkrycie karty!!!");
                         break;
                     }
                 case 4:
                     {//disable button GetMyCard
-                     // if ((MainWindow)Application.Current.MainWindow.Dispatcher.CheckAccess())
-                     //     ((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = false;
-                     // else
-                     // Application.Current.MainWindow.Dispatcher.BeginInvoke(
-                     //     DispatcherPriority.Background,
-                     //     new Action(() => ((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = false));
-                       
-                        // ((MainWindow)Application.Current.MainWindow).DisableGetMyCard();
+                        MainWindow.DisableGetMyCard();
                         break;
                     }
                 case 5:
@@ -249,26 +232,24 @@ namespace Client
                         var idPlayer = _byteDataReceive[2];
                         var idCard = _byteDataReceive[3];
                         GameClass.ChangeCardAtThePlayer(idPlayer,idCard);
+
+                        
+                        var PlayerName = GameClass.GetPlayerNameFromId(idPlayer);
+                        if(PlayerName != GameClass.MyPlayerName && idCard!=0)
+                            MainWindow.AddGameHistoryText("Gracz "+ PlayerName + " wyłożył kartę");
+
                         break;
                     }
                 case 6:
                     {//message to winner of the fight for totem
-                        MessageBox.Show("Wygrałeś pojedynek o totem!!!");
-                        /*
-                        ((MainWindow)Application.Current.MainWindow).Dispatcher.Invoke(
-                                 DispatcherPriority.Background,
-                                new Action(() =>
-                                {
-                                    string str = ((MainWindow)Application.Current.MainWindow).TbMenu.Text;
-                                    ((MainWindow)Application.Current.MainWindow).TbMenu.Text = "Wygrałeś pojedynek o totem!!!" + str;
-                                }));
-                                */
                         //MessageBox.Show("Wygrałeś pojedynek o totem!!!");
+                        MainWindow.AddGameHistoryText("Wygrałeś pojedynek o totem!!!");
                         break;
                     }
                 case 7:
                     {//message to loser of the fight for totem
-                        MessageBox.Show("Przegrałeś pojedynek o totem!!!");
+                        //MessageBox.Show("Przegrałeś pojedynek o totem!!!");
+                        MainWindow.AddGameHistoryText("Przegrałeś pojedynek o totem!!!");
                         break;
                     }
                 case 8:
@@ -330,14 +311,15 @@ namespace Client
                         //destruct/reset game object
                         var winnerId = _byteDataReceive[2];
                         string winnerName = GameClass.GetPlayerNameFromId(winnerId);
+
                         MessageBox.Show("Gra zakończona. \nWygrał gracz: "+ winnerName);
+                        MainWindow.AddGameHistoryText("Gra zakończona. Wygrał gracz: " + winnerName);
 
+                        var myNick = GameClass.MyPlayerName;
                         GameClass.ClearGameClass();
+                        GameClass.MyPlayerName = myNick;
 
-                        Application.Current.MainWindow.Dispatcher.BeginInvoke(
-                            DispatcherPriority.Background,
-                            new Action(() => ((MainWindow)Application.Current.MainWindow).CUserControl.Content = new UCMainScreen()));
-                        
+                        MainWindow.SetUCMainScreen();
                         break;
                     }
 
@@ -589,4 +571,5 @@ namespace Client
         RemovePlayerFromRoom,
         StartGame
     };
+    
 }

@@ -18,18 +18,86 @@ namespace Client
             CUserControl.Content = new UCMainScreen();
         }
 
-        public void EnableGetMyCard()
+        public static void EnableGetMyCard()
         {
-                Application.Current.MainWindow.Dispatcher.Invoke(
-                     DispatcherPriority.Background,
-                    new Action (()=>((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = true));
+            try
+            {
+                Application.Current.Dispatcher.BeginInvoke(
+                        DispatcherPriority.Background,
+                        new Action(() => 
+                                ((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = true
+                        ));
+            }
+            catch (Exception)
+            {
+                //ignored
+            }
         }
 
-        public void DisableGetMyCard()
+        public static void DisableGetMyCard()
         {
-             Application.Current.Dispatcher.BeginInvoke(
-                 DispatcherPriority.Background,
-                 new Action(() => ((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = false));
+            try
+            {
+                Application.Current.Dispatcher.BeginInvoke(
+                        DispatcherPriority.Background,
+                        new Action(() =>
+                                ((MainWindow)Application.Current.MainWindow).BtGetUpCard.IsEnabled = false
+                        ));
+            }
+            catch (Exception)
+            {
+                //ignored
+            }
+        }
+
+        public static void AddGameHistoryText(string msg)
+        {
+            try
+            {
+                Application.Current.Dispatcher.BeginInvoke(
+                        DispatcherPriority.Background,
+                        new Action(() =>
+                                ((MainWindow)Application.Current.MainWindow).TbGameHistory.Text 
+                                    = msg + "\n" +((MainWindow)Application.Current.MainWindow).TbGameHistory.Text
+                        ));
+            }
+            catch (Exception)
+            {
+                //ignored
+            }
+        }
+
+        public static void ClearGameHistoryText()
+        {
+            try
+            {
+                Application.Current.Dispatcher.BeginInvoke(
+                        DispatcherPriority.Background,
+                        new Action(() =>
+                                ((MainWindow)Application.Current.MainWindow).TbGameHistory.Text
+                                    = ""
+                        ));
+            }
+            catch (Exception)
+            {
+                //ignored
+            }
+        }
+
+        public static void SetUCMainScreen()
+        {
+            try
+            {
+                Application.Current.Dispatcher.BeginInvoke(
+                        DispatcherPriority.Background,
+                        new Action(() =>
+                                ((MainWindow)Application.Current.MainWindow).CUserControl.Content = new UCMainScreen()
+                        ));
+            }
+            catch (Exception)
+            {
+                //ignored
+            }
         }
 
         private void NewRoom(object sender, RoutedEventArgs e) //menu
