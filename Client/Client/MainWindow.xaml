@@ -17,7 +17,7 @@
                 <MenuItem Header="Utwórz nowy pokój" Click="NewRoom"></MenuItem>
                 <MenuItem Header="Dołącz do pokoju" Click="JoinToRoom"></MenuItem>
             </MenuItem>
-            <MenuItem Header="Pomoc">
+            <MenuItem Header="Pomoc" Click="MenuItem_Click">
             </MenuItem>
         </Menu>
         <ContentControl x:Name="CUserControl" Grid.Row="0" Margin="10,35,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="500" Width="500"/>
